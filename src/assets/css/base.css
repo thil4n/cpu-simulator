@@ -1,0 +1,24 @@
+:root {
+  --primary: #009f7f;
+  --primary-2: #019376;
+  --secondary: #000000;
+  --secondary-2: #111;
+  --text-base: #6b7280;
+  --text-heading: #1f2937;
+  --text-primary: #000;
+  --font-sans: -apple-system, system-ui, BlinkMacSystemFont, "Helvetica Neue",
+    "Helvetica", sans-serif;
+
+  --gossamer-50: #f2faf9;
+  --gossamer-100: #e6f5f2;
+  --gossamer-200: #bfe7df;
+  --gossamer-300: #99d9cc;
+  --gossamer-400: #4dbca5;
+  --gossamer-500: #009f7f;
+  --gossamer-600: #008f72;
+  --gossamer-700: #00775f;
+  --gossamer-800: #005f4c;
+  --gossamer-900: #004e3e;
+
+  --gray-300: #d1d5db;
+}

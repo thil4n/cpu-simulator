@@ -1,0 +1,11 @@
+@tailwind base;
+@import "./base.css";
+@layer base {
+    a {
+        @apply no-underline;
+    }
+}
+@import "./custom-plugins.css";
+@import "./style.css";
+@tailwind components;
+@tailwind utilities;
