@@ -18,9 +18,8 @@ module.exports = {
                     200: "#ebedef",
                     100: "#f2f3f5",
                 },
-                primary: "#00b894",
-                secondery: "#dfe6e9",
-                transparent: "rgba(255, 255, 255, 0.5)",
+                primary: "#143b46",
+                secondary: "#2b6d7e",
             },
             spacing: {
                 88: "22rem",
