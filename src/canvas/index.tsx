@@ -41,7 +41,7 @@ const Canvas = () => {
 
     const [inputs, setInputs] = useState(inputDataStructure);
 
-    let gpRegisters = {
+    let registers = {
         rax: { key: "rax", data: null, desc: "Accumulator Register" },
         rbx: { key: "rbx", data: null, desc: "Base Register" },
         rcx: { key: "rcx", data: null, desc: "Counter Register" },
@@ -52,9 +52,7 @@ const Canvas = () => {
 
         rbp: { key: "rbp", data: 10000, desc: "Base Pointer Register" },
         rsp: { key: "rsp", data: 10100, desc: "Stack Pointer Register" },
-    };
 
-    let adgpRegisters = {
         r8: { key: "r8", data: null, desc: "R8 Register" },
         r9: { key: "r9", data: null, desc: "R9 Register" },
         r10: { key: "r10", data: null, desc: "R10 Register" },
@@ -63,16 +61,35 @@ const Canvas = () => {
         r13: { key: "r13", data: null, desc: "R13 Register" },
         r14: { key: "r14", data: null, desc: "R14 Register" },
         r15: { key: "r15", data: null, desc: "R15 Register" },
+
+        rip: { key: "rip", data: null, desc: "Instruction Pointer Register" },
+
+        rflags: { key: "rflags", data: null, desc: "R Flags Register" },
     };
 
-    let rip = { key: "rip", data: null, desc: "Instruction Pointer Register" };
-    let rflags = { key: "rflags", data: null, desc: "R Flags Register" };
-
-    const gpRegisterArray = Object.values(gpRegisters);
-    const adgpRegisterArray = Object.values(adgpRegisters);
+    const gp_registers = [
+        "rax",
+        "rbx",
+        "rcx",
+        "rdx",
+        "rsi",
+        "rdi",
+        "rbp",
+        "rsp",
+    ];
+    const adgp_registers = [
+        "r8",
+        "r9",
+        "r10",
+        "r11",
+        "r12",
+        "r13",
+        "r14",
+        "r15",
+    ];
 
     const showMemory = (startAddr: number, highlightLength = 0) => {
-        const endAddr = startAddr + 400;
+        const endAddr = startAddr + 200;
         let memory = [];
 
         for (let index = startAddr; index < endAddr; index += 8) {
@@ -259,6 +276,10 @@ const Canvas = () => {
 
     const handleMove = (src: any, dest: any) => {};
 
+    const accessMemory = (src: any, dest: any) => {};
+
+    const copyValueToMemory = (dest: any, value: number) => {};
+
     const handlePush = (operand: any) => {
         if (isRegister(operand)) {
             toast.info(" operand  is a register");
@@ -352,7 +373,7 @@ const Canvas = () => {
                         return (
                             <MemoryCell
                                 cell={cell}
-                                id={Math.random()}
+                                key={Math.random()}
                                 handleClick={handleClickRegister}
                             />
                         );
@@ -415,33 +436,36 @@ const Canvas = () => {
                         </h1>
                         <div className="grid grid-cols-3 gap-1 mt-3 px-2">
                             <div>
-                                {gpRegisterArray.map((register) => {
+                                {gp_registers.map((register) => {
                                     return (
-                                        <Register
-                                            id={Math.random()}
-                                            register={register}
+                                        <Button
+                                            key={register}
+                                            text={register}
                                             handleClick={handleClickRegister}
                                         />
                                     );
                                 })}
                             </div>
                             <div>
-                                {adgpRegisterArray.map((register) => {
+                                {adgp_registers.map((register) => {
                                     return (
-                                        <Register
-                                            id={Math.random()}
-                                            register={register}
+                                        <Button
+                                            key={register}
+                                            text={register}
                                             handleClick={handleClickRegister}
                                         />
                                     );
                                 })}
                             </div>
                             <div>
-                                <Register
-                                    register={rip}
+                                <Button
+                                    text={"RIP"}
                                     handleClick={handleClickRegister}
                                 />
-                                <Register register={rflags} />
+                                <Button
+                                    text={"RFLGAS"}
+                                    handleClick={handleClickRegister}
+                                />
                             </div>
                         </div>
                     </div>
@@ -454,8 +478,8 @@ const Canvas = () => {
                                 <Button
                                     text={"Stack"}
                                     handleClick={() => {
-                                        const rbp = gpRegisters.rbp.data;
-                                        const rsp = gpRegisters.rsp.data;
+                                        const rbp = registers.rbp.data;
+                                        const rsp = registers.rsp.data;
                                         const stackLength = rsp - rbp;
                                         showMemory(rbp, stackLength);
                                     }}
@@ -497,9 +521,9 @@ const Canvas = () => {
                     register={selectedRegister}
                 />
             )}
-            {loadingState && (
+            {/* {loadingState && (
                 <Loader handleClose={() => setLoadingState(false)} />
-            )}
+            )} */}
         </div>
     );
 };
