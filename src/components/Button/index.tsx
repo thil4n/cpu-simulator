@@ -23,9 +23,10 @@ const Button: React.FC<ButtonProps> = ({
     return (
         <button
             onClick={handleClickWrapper}
-            className={`border-2 px-12 py-2 font-semibold bg-secondary text-white
-                        hover:bg-primary cursor-pointer
-                        rounded-md mb-2 ${className}`}
+            className={`border-1 text-sm 
+                        rounded-md mb-2 w-full border-2 border-slate-500 bg-primary
+                         text-secondary hover:bg-secondary hover:text-white  px-2 py-2
+                        cursor-pointer text-center uppercase ${className}`}
             disabled={disabled || loading}
         >
             {loading ? <div className="loader"></div> : text}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, SetStateAction } from "react";
 import { ToastContainer } from "react-toastify";
 import { toast } from "react-toastify";
 
@@ -7,11 +7,16 @@ import { Button, Input, Loader } from "@components";
 import MemoryCell from "./MemoryCell";
 import Register from "./Register";
 import MemoryView from "./MemoryView";
+import { useForm } from "@hooks";
 
 const Canvas = () => {
     const [selectedRegister, setSelectedRegister] = useState(null);
     const [loadingState, setLoadingState] = useState(true);
     const [memory, setMemory] = useState([]);
+    const { formData, errors, handleChange, setErrors } = useForm({
+        assemblyInput: "",
+        addrInput: "",
+    });
 
     const inputDataStructure = {
         assemblyInput: {
@@ -36,16 +41,8 @@ const Canvas = () => {
 
     const [inputs, setInputs] = useState(inputDataStructure);
 
-    const handleChange = (data, input) => {
-        input.data = data;
-
-        let input_list = { ...inputs };
-        input_list[input.key] = input;
-        setInputs(input_list);
-    };
-
     let gpRegisters = {
-        rax: { key: "rax", data: null, desc: "Acumilator Register" },
+        rax: { key: "rax", data: null, desc: "Accumulator Register" },
         rbx: { key: "rbx", data: null, desc: "Base Register" },
         rcx: { key: "rcx", data: null, desc: "Counter Register" },
         rdx: { key: "rdx", data: null, desc: "Data Register" },
@@ -74,7 +71,7 @@ const Canvas = () => {
     const gpRegisterArray = Object.values(gpRegisters);
     const adgpRegisterArray = Object.values(adgpRegisters);
 
-    const showMemory = (startAddr, highlightLength = 0) => {
+    const showMemory = (startAddr: number, highlightLength = 0) => {
         const endAddr = startAddr + 400;
         let memory = [];
 
@@ -88,7 +85,7 @@ const Canvas = () => {
         setMemory(memory);
     };
 
-    const is64BitRegister = (str) => {
+    const is64BitRegister = (str: string) => {
         const gpRegisters = [
             "rax",
             "rbx",
@@ -122,7 +119,7 @@ const Canvas = () => {
         );
     };
 
-    const is32BitRegister = (str) => {
+    const is32BitRegister = (str: string) => {
         const gpRegisters = [
             "eax",
             "ebx",
@@ -150,7 +147,7 @@ const Canvas = () => {
         return gpRegisters.includes(str) || adgpRegisters.includes(str);
     };
 
-    const is16BitRegister = (str) => {
+    const is16BitRegister = (str: string) => {
         const gpRegisters = ["ax", "bx", "cx", "dx", "si", "di", "bp", "sp"];
 
         const adgpRegisters = [
@@ -167,7 +164,7 @@ const Canvas = () => {
         return gpRegisters.includes(str) || adgpRegisters.includes(str);
     };
 
-    const is8BitRegister = (str) => {
+    const is8BitRegister = (str: string) => {
         const gpRegistersLower = ["al", "bl", "cl", "dl"];
         const gpRegistersHigher = ["ah", "bh", "ch", "dh"];
 
@@ -192,52 +189,120 @@ const Canvas = () => {
         );
     };
 
-    const handleClickRegister = (register) => {
+    const isRegister = (str: string): boolean => {
+        const registers = [
+            "rax",
+            "rbx",
+            "rcx",
+            "rdx",
+            "rsi",
+            "rdi",
+            "rbp",
+            "rsp",
+            "r8",
+            "r9",
+            "r10",
+            "r11",
+            "r12",
+            "r13",
+            "r14",
+            "r15",
+            "eax",
+            "ebx",
+            "ecx",
+            "edx",
+            "esi",
+            "edi",
+            "ebp",
+            "esp",
+            "ax",
+            "bx",
+            "cx",
+            "dx",
+            "si",
+            "di",
+            "bp",
+            "sp",
+            "al",
+            "bl",
+            "cl",
+            "dl",
+            "ah",
+            "bh",
+            "ch",
+            "dh",
+            "sil",
+            "dil",
+            "r8b",
+            "r9b",
+            "r10b",
+            "r11b",
+            "r12b",
+            "r13b",
+            "r14b",
+            "r15b",
+        ];
+        return registers.includes(str.toLowerCase());
+    };
+
+    const isNumericValue = (str: string): boolean => {
+        return /^[0-9]+$/.test(str);
+    };
+
+    const isMemoryAddress = (str: string): boolean => {
+        return /^0x[0-9a-fA-F]+$/.test(str);
+    };
+
+    const handleClickRegister = (register: SetStateAction<null>) => {
         setSelectedRegister(register);
     };
 
-    const handleMove = (src, dest) => {};
-    const handlePush = (oparand) => {
-        if (is64BitRegister(oparand)) {
-        } else if (0) {
+    const handleMove = (src: any, dest: any) => {};
+
+    const handlePush = (operand: any) => {
+        if (isRegister(operand)) {
+            toast.info(" operand  is a register");
+        } else if (isMemoryAddress(operand)) {
+            toast.info(" operand  is a memory address");
+        } else if (isNumericValue(operand)) {
+            toast.info(" operand  is a value");
         } else {
-            toast.info(
-                " oparand  is a 64 bi register ? " + is64BitRegister(oparand)
-            );
+            toast.info(" Invalid operand");
         }
     };
-    const handlePop = (dest) => {};
-    const handleAdd = (src, dest) => {};
-    const handleSub = (src, dest) => {};
-    const handleCmp = (src, dest) => {};
 
-    const parseSingleLine = (instruction) => {
+    const handlePop = (dest: any) => {};
+    const handleAdd = (src: any, dest: any) => {};
+    const handleSub = (src: any, dest: any) => {};
+    const handleCmp = (src: any, dest: any) => {};
+
+    const parseSingleLine = (instruction: string) => {
         const [operation, operands] = instruction
             .match(/(\S+)\s+(.*)/)
             .slice(1);
-        const [oparandOne, oparandTwo] = operands.split(/[,\s]+/);
+        const [operandOne, operandTwo] = operands.split(/[,\s]+/);
 
         console.log("operation: " + operation);
-        console.log("oparandOne: " + oparandOne);
-        console.log("oparandTwo: " + oparandTwo);
+        console.log("operandOne: " + operandOne);
+        console.log("operandTwo: " + operandTwo);
 
-        return [operation, oparandOne, oparandTwo];
+        return [operation, operandOne, operandTwo];
     };
     const parseAssembly = () => {
-        const instructions = inputs.assemblyInput.data;
-        const lines = instructions.split("\n");
+        const instruction = formData.assemblyInput;
 
-        const [operation, oparandOne, oparandTwo] = parseSingleLine(lines[0]);
+        const [operation, operandOne, operandTwo] =
+            parseSingleLine(instruction);
 
         switch (operation) {
             case "mov":
-                const src = oparandTwo;
-                const dest = oparandOne;
+                const src = operandTwo;
+                const dest = operandOne;
 
                 break;
 
             case "push":
-                handlePush(oparandOne);
+                handlePush(operandOne);
 
                 break;
 
@@ -270,6 +335,10 @@ const Canvas = () => {
         { instruction: "leave", operands: [] },
         { instruction: "ret", operands: [] },
     ];
+
+    const execute = () => {
+        parseAssembly();
+    };
 
     return (
         <div className="w-full h-screen bg-[#2d3436] px-4">
@@ -315,10 +384,7 @@ const Canvas = () => {
                             CONTROL EXECUTION
                         </h1>
                         <div className="px-2">
-                            <Button
-                                text="LOAD PROGRAM"
-                                handleClick={parseAssembly}
-                            />
+                            <Button text="LOAD PROGRAM" handleClick={execute} />
                             <Button
                                 text="BREAKPOINTS"
                                 handleClick={parseAssembly}
@@ -333,6 +399,11 @@ const Canvas = () => {
                                     handleClick={parseAssembly}
                                 />
                             </div>
+                            <Input
+                                name="assemblyInput"
+                                value={formData.assemblyInput}
+                                handleChange={handleChange}
+                            />
                         </div>
                     </div>
                 </div>
@@ -393,10 +464,7 @@ const Canvas = () => {
                                 <Button text={".BSS"} />
                                 <Button text={".TXT"} />
                                 <Button text={".DATA"} />
-                                <Input
-                                    input={inputs.addrInput}
-                                    handleChange={handleChange}
-                                />
+                                <Button text={"Address"} />
                             </div>
                             <div className="  grid grid-cols-2 gap-2">
                                 <Button

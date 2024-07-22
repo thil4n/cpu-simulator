@@ -43,7 +43,7 @@ const MemoeryView = ({ register, handleClose }) => {
                                     );
                                 })}
                             </div>
-                            <div className="w-full px-2 grid grid-cols-6 mt-4 mb-6">
+                            <div className="w-full px-2 grid grid-cols-6 mt-4 mb-6 gap-2">
                                 <Button text={"LEFT HALF"} />
                                 <Button text={"RIGHT HALF"} />
                                 <Button text={"FIRST 8 BITS"} />
