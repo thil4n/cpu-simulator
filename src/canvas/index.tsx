@@ -11,37 +11,18 @@ import { useForm } from "@hooks";
 
 const Canvas = () => {
     const [selectedRegister, setSelectedRegister] = useState(null);
+    const [examineMemory, setExamineMemory] = useState(null);
+
     const [loadingState, setLoadingState] = useState(true);
-    const [memory, setMemory] = useState([]);
-    const { formData, errors, handleChange, setErrors } = useForm({
+    const { formData, handleChange, setErrors } = useForm({
         assemblyInput: "",
         addrInput: "",
     });
 
-    const inputDataStructure = {
-        assemblyInput: {
-            key: "assemblyInput",
-            label: "",
-            data: "",
-            type: "text",
-            rows: 10,
-            isValid: true,
-            error: "",
-        },
-        addrInput: {
-            key: "addrInput",
-            label: "",
-            data: "",
-            type: "text",
-            placeHolder: "0X000186F0",
-            isValid: true,
-            error: "",
-        },
-    };
+    const [memory, setMemory] = useState([]);
+    const [memoryValues, setMemoryValues] = useState({});
 
-    const [inputs, setInputs] = useState(inputDataStructure);
-
-    let registers = {
+    const registers = {
         rax: { key: "rax", data: null, desc: "Accumulator Register" },
         rbx: { key: "rbx", data: null, desc: "Base Register" },
         rcx: { key: "rcx", data: null, desc: "Counter Register" },
@@ -278,7 +259,9 @@ const Canvas = () => {
 
     const accessMemory = (src: any, dest: any) => {};
 
-    const copyValueToMemory = (dest: any, value: number) => {};
+    const copyValue = (dest: any, value: number) => {
+        setMemoryValues({ ...memoryValues, [dest]: value });
+    };
 
     const handlePush = (operand: any) => {
         if (isRegister(operand)) {
@@ -287,6 +270,7 @@ const Canvas = () => {
             toast.info(" operand  is a memory address");
         } else if (isNumericValue(operand)) {
             toast.info(" operand  is a value");
+            copyValue(registers.rsp.data, parseInt(operand));
         } else {
             toast.info(" Invalid operand");
         }
@@ -374,7 +358,8 @@ const Canvas = () => {
                             <MemoryCell
                                 cell={cell}
                                 key={Math.random()}
-                                handleClick={handleClickRegister}
+                                handleExamineMemory={setExamineMemory}
+                                value={memoryValues[cell.address]}
                             />
                         );
                     })}
@@ -515,10 +500,11 @@ const Canvas = () => {
                 </div>
             </div>
 
-            {selectedRegister && (
+            {examineMemory && (
                 <MemoryView
-                    handleClose={() => setSelectedRegister(null)}
-                    register={selectedRegister}
+                    startAddr={examineMemory.startAddr}
+                    wordCount={examineMemory.wordCount}
+                    handleClose={() => setExamineMemory(null)}
                 />
             )}
             {/* {loadingState && (

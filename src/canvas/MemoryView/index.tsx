@@ -1,7 +1,8 @@
 import { Button } from "@components";
+import Word from "./word";
 
-const MemoeryView = ({ register, handleClose }) => {
-    let value = register.data;
+const MemoryView = ({ startAddr, wordCount, handleClose }) => {
+    let value = 5;
     if (!value) {
         value = Math.floor(Math.random() * 1000) + 1;
     }
@@ -26,30 +27,10 @@ const MemoeryView = ({ register, handleClose }) => {
                             }}
                         >
                             <div className=" bg-primary text-secondary text-center  font-bold text-xl pl-3 w-full py-2 uppercase">
-                                Examine Memory{" "}
-                                {register && (
-                                    <span>({register.key + " REGISTER"})</span>
-                                )}
+                                Examine Memory
                             </div>
                             <div className="w-full px-2 flex mt-4 mb-6">
-                                {cells.map((item) => {
-                                    return (
-                                        <div
-                                            key={Math.random()}
-                                            className="bg-primary border-r border-slate-500 cursor-pointer text-secondary hover:bg-secondary hover:text-white text-sm w-full text-center"
-                                        >
-                                            {item}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                            <div className="w-full px-2 grid grid-cols-6 mt-4 mb-6 gap-2">
-                                <Button text={"LEFT HALF"} />
-                                <Button text={"RIGHT HALF"} />
-                                <Button text={"FIRST 8 BITS"} />
-                                <Button text={"SECOND 8 BITS"} />
-                                <Button text={"THIRD 8 BITS"} />
-                                <Button text={"FOURTH 8 BITS"} />
+                                <Word value={128} />
                             </div>
                         </div>
                     </div>
@@ -59,4 +40,4 @@ const MemoeryView = ({ register, handleClose }) => {
     );
 };
 
-export default MemoeryView;
+export default MemoryView;
