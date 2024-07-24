@@ -1,13 +1,26 @@
 import { Button } from "@components";
-import Word from "./word";
 
-const MemoryView = ({ startAddr, wordCount, handleClose }) => {
-    let value = 5;
-    if (!value) {
-        value = Math.floor(Math.random() * 1000) + 1;
+const MemoryView = ({ startAddr, memoryValues, handleClose }) => {
+    const count = 20;
+    const x = 1 ? 1 : 8;
+
+    let cells = [];
+
+    for (let i = 0; i < count; i++) {
+        const addr = startAddr + i * x;
+
+        // Convert binary string to hexadecimal
+        const value = memoryValues[addr]
+            ? parseInt(memoryValues[addr], 2).toString(16).padStart(2, "0")
+            : Math.floor(Math.random() * 100)
+                  .toString(16)
+                  .padStart(2, "0");
+
+        cells.push({
+            addr,
+            value,
+        });
     }
-    const binaryString = value.toString(2).padStart(64, "0");
-    const cells = binaryString.split("");
 
     return (
         <div
@@ -26,11 +39,20 @@ const MemoryView = ({ startAddr, wordCount, handleClose }) => {
                                 e.stopPropagation();
                             }}
                         >
-                            <div className=" bg-primary text-secondary text-center  font-bold text-xl pl-3 w-full py-2 uppercase">
+                            <div className=" bg-primary text-secondary text-center font-bold text-xl pl-3 w-full py-2 uppercase">
                                 Examine Memory
                             </div>
-                            <div className="w-full px-2 flex mt-4 mb-6">
-                                <Word value={128} />
+                            <div className="w-full px-2 grid grid-cols-8 gap-2 mt-4 mb-6">
+                                {cells.map((item) => {
+                                    return (
+                                        <div
+                                            key={item.addr}
+                                            className="bg-primary border-r border-slate-500 cursor-pointer text-secondary hover:bg-secondary hover:text-white text-sm w-full text-center"
+                                        >
+                                            0x{item.value}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>

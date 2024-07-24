@@ -40,11 +40,11 @@ const Input: React.FC<InputProps> = ({
 
     const inputClasses = (): string => {
         let classes =
-            "w-full bg-white " +
+            "w-full bg-primary text-secondary " +
             "appearance-none transition duration-300 " +
             "ease-in-out focus:outline-none " +
             "focus:ring-0 border mb-2 " +
-            "border-border-base rounded-md focus:border-green-500 h-12 ";
+            "border-border-base rounded-md border-slate-500 h-12 ";
 
         classes += icon ? "px-10  " : "px-4 ";
         classes += inputClassName;

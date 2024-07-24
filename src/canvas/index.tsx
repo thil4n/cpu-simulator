@@ -8,6 +8,7 @@ import MemoryCell from "./MemoryCell";
 import Register from "./Register";
 import MemoryView from "./MemoryView";
 import { useForm } from "@hooks";
+import { log } from "console";
 
 const Canvas = () => {
     const [selectedRegister, setSelectedRegister] = useState(null);
@@ -20,7 +21,7 @@ const Canvas = () => {
     });
 
     const [memory, setMemory] = useState([]);
-    const [memoryValues, setMemoryValues] = useState({});
+    const [memoryValues, memset] = useState({});
 
     const registers = {
         rax: { key: "rax", data: null, desc: "Accumulator Register" },
@@ -259,18 +260,43 @@ const Canvas = () => {
 
     const accessMemory = (src: any, dest: any) => {};
 
-    const copyValue = (dest: any, value: number) => {
-        setMemoryValues({ ...memoryValues, [dest]: value });
+    const intcpy = (dest: number, value: number) => {
+        const memoryValuesCopy = { ...memoryValues };
+        const binaryString = value.toString(2).padStart(64, "0");
+
+        for (let i = 0; i < 8; i++) {
+            const byteString = binaryString.slice(i * 8, (i + 1) * 8);
+
+            memoryValuesCopy[dest + 7 - i] = byteString;
+        }
+
+        memset(memoryValuesCopy);
+
+        console.log(registers.rsp.data);
+    };
+
+    const strcpy = (dest: number, string: string) => {
+        const memoryValuesCopy = { ...memoryValues };
+        const binaryString = value.toString(2).padStart(64, "0");
+
+        for (let i = 0; i < 8; i++) {
+            const byteString = binaryString.slice(i * 8, (i + 1) * 8);
+
+            memoryValuesCopy[dest + 7 - i] = byteString;
+        }
+
+        memset(memoryValuesCopy);
     };
 
     const handlePush = (operand: any) => {
         if (isRegister(operand)) {
+            intcpy(registers.rsp.data, registers[operand].data);
             toast.info(" operand  is a register");
         } else if (isMemoryAddress(operand)) {
             toast.info(" operand  is a memory address");
         } else if (isNumericValue(operand)) {
             toast.info(" operand  is a value");
-            copyValue(registers.rsp.data, parseInt(operand));
+            intcpy(registers.rsp.data, parseInt(operand));
         } else {
             toast.info(" Invalid operand");
         }
@@ -505,6 +531,7 @@ const Canvas = () => {
                     startAddr={examineMemory.startAddr}
                     wordCount={examineMemory.wordCount}
                     handleClose={() => setExamineMemory(null)}
+                    memoryValues={memoryValues}
                 />
             )}
             {/* {loadingState && (
