@@ -5,10 +5,8 @@ import { toast } from "react-toastify";
 import { Button, Input, Loader } from "@components";
 
 import MemoryCell from "./MemoryCell";
-import Register from "./Register";
 import MemoryView from "./MemoryView";
 import { useForm } from "@hooks";
-import { log } from "console";
 
 const Canvas = () => {
     const [selectedRegister, setSelectedRegister] = useState(null);
@@ -288,7 +286,20 @@ const Canvas = () => {
         memset(memoryValuesCopy);
     };
 
-    const handlePush = (operand: any) => {
+    const push = (operand: any) => {
+        if (isRegister(operand)) {
+            intcpy(registers.rsp.data, registers[operand].data);
+            toast.info(" operand  is a register");
+        } else if (isMemoryAddress(operand)) {
+            toast.info(" operand  is a memory address");
+        } else if (isNumericValue(operand)) {
+            toast.info(" operand  is a value");
+            intcpy(registers.rsp.data, parseInt(operand));
+        } else {
+            toast.info(" Invalid operand");
+        }
+    };
+    const mov = (src: any, dest: any) => {
         if (isRegister(operand)) {
             intcpy(registers.rsp.data, registers[operand].data);
             toast.info(" operand  is a register");
@@ -302,10 +313,10 @@ const Canvas = () => {
         }
     };
 
-    const handlePop = (dest: any) => {};
-    const handleAdd = (src: any, dest: any) => {};
-    const handleSub = (src: any, dest: any) => {};
-    const handleCmp = (src: any, dest: any) => {};
+    const pop = (dest: any) => {};
+    const add = (src: any, dest: any) => {};
+    const sub = (src: any, dest: any) => {};
+    const cmp = (src: any, dest: any) => {};
 
     const parseSingleLine = (instruction: string) => {
         const [operation, operands] = instruction
@@ -329,11 +340,12 @@ const Canvas = () => {
             case "mov":
                 const src = operandTwo;
                 const dest = operandOne;
+                mov(src, dest);
 
                 break;
 
             case "push":
-                handlePush(operandOne);
+                push(operandOne);
 
                 break;
 
