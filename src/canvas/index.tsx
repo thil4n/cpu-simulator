@@ -313,7 +313,7 @@ const Canvas = () => {
             toast.info("operand  is a value");
             intcpy(registers.rsp.data, parseInt(operand));
         } else {
-            toast.info(" Invalid operand");
+            toast.info("Invalid operand");
         }
     };
 
@@ -386,27 +386,6 @@ const Canvas = () => {
     useEffect(() => {
         showMemory(20000);
     }, []);
-
-    const cpuInstructions = [
-        { instruction: "push", operands: ["ebp"] },
-        { instruction: "mov", operands: ["ebp", "esp"] },
-        { instruction: "and", operands: ["esp", "0xfffffff0"] },
-        { instruction: "sub", operands: ["esp", "0x60"] },
-        { instruction: "mov", operands: ["DWORD PTR [esp+0x5c]", "0x0"] },
-        { instruction: "lea", operands: ["eax", "[esp+0x1c]"] },
-        { instruction: "mov", operands: ["DWORD PTR [esp]", "eax"] },
-        { instruction: "call", operands: ["0x804830c <gets@plt>"] },
-        { instruction: "mov", operands: ["eax", "DWORD PTR [esp+0x5c]"] },
-        { instruction: "test", operands: ["eax", "eax"] },
-        { instruction: "je", operands: ["0x8048427 <main+51>"] },
-        { instruction: "mov", operands: ["DWORD PTR [esp]", "0x8048500"] },
-        { instruction: "call", operands: ["0x804832c <puts@plt>"] },
-        { instruction: "jmp", operands: ["0x8048433 <main+63>"] },
-        { instruction: "mov", operands: ["DWORD PTR [esp]", "0x8048529"] },
-        { instruction: "call", operands: ["0x804832c <puts@plt>"] },
-        { instruction: "leave", operands: [] },
-        { instruction: "ret", operands: [] },
-    ];
 
     const execute = () => {
         parseAssembly();
