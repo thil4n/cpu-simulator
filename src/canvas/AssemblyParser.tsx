@@ -1,10 +1,18 @@
-import { toast } from "react-toastify";
-
 import { Button, TextArea } from "@components";
 import { useForm } from "@hooks";
 
-const AssemblyParser = ({ setInstructions }) => {
-    const { formData, setFormData, errors, handleChange, setErrors } = useForm({
+interface Instruction {
+    operation: string;
+    operandOne: string | null;
+    operandTwo: string | null;
+}
+
+interface AssemblyParserProps {
+    setInstructions: React.Dispatch<React.SetStateAction<Instruction[]>>;
+}
+
+const AssemblyParser: React.FC<AssemblyParserProps> = ({ setInstructions }) => {
+    const { formData, handleChange } = useForm({
         instructions: "",
     });
 
@@ -24,14 +32,14 @@ const AssemblyParser = ({ setInstructions }) => {
     };
 
     const praseInstructions = async () => {
-        let instructions = [];
+        let instructions: Instruction[] = [];
 
         const lines = formData.instructions.trim().split("\n").filter(Boolean);
 
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i].trim();
             if (line) {
-                const instruction = parseSingleLine(line);
+                const instruction: Instruction = parseSingleLine(line);
                 instructions.push(instruction);
             }
         }
