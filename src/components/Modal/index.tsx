@@ -17,7 +17,7 @@ const Modal: React.FC<ModalProps> = ({
         <div className="relative z-10">
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity overflow-y-auto">
                 <div
-                    className={`shadow-xl transition-all w-[25%] mx-auto mt-[100px] rounded-lg bg-white ${className}`}
+                    className={`shadow-xl transition-all w-[25%] mx-auto mt-[100px] rounded-lg bg-[#2d3436] ${className}`}
                 >
                     <div className="w-full bg-primary text-white text-xl mb-6 flex items-center justify-between">
                         <h3 className="mx-auto py-1">{title}</h3>

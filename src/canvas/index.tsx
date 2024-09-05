@@ -2,18 +2,25 @@ import { useState, useEffect, SetStateAction } from "react";
 import { ToastContainer } from "react-toastify";
 import { toast } from "react-toastify";
 
-import { Button, Input, Loader } from "@components";
+import { Button, Input } from "@components";
 
 import MemoryCell from "./MemoryCell";
 import MemoryView from "./MemoryView";
-import { useForm } from "@hooks";
+import { useForm, useModal } from "@hooks";
+import Modal from "@components/Modal";
+import AssemblyParser from "./AssemblyParser";
 
 const Canvas = () => {
     const [selectedRegister, setSelectedRegister] = useState(null);
     const [examineMemory, setExamineMemory] = useState(null);
+    const [instructions, setInstructions] = useState([]);
 
-    const [loadingState, setLoadingState] = useState(true);
-    const { formData, handleChange, setErrors } = useForm({
+    const { modalStatus, openModal, closeModal } = useModal({
+        instructionsModal: false,
+        registersModal: false,
+    });
+
+    const { formData, handleChange } = useForm({
         assemblyInput: "",
         addrInput: "",
     });
@@ -21,7 +28,17 @@ const Canvas = () => {
     const [memory, setMemory] = useState([]);
     const [memoryValues, memset] = useState({});
 
-    const registers = {
+    interface Register {
+        key: string;
+        data: number | null;
+        desc: string;
+    }
+
+    interface CacheMem {
+        [key: string]: Register;
+    }
+
+    const registers: CacheMem = {
         rax: { key: "rax", data: null, desc: "Accumulator Register" },
         rbx: { key: "rbx", data: null, desc: "Base Register" },
         rcx: { key: "rcx", data: null, desc: "Counter Register" },
@@ -47,27 +64,6 @@ const Canvas = () => {
         rflags: { key: "rflags", data: null, desc: "R Flags Register" },
     };
 
-    const gp_registers = [
-        "rax",
-        "rbx",
-        "rcx",
-        "rdx",
-        "rsi",
-        "rdi",
-        "rbp",
-        "rsp",
-    ];
-    const adgp_registers = [
-        "r8",
-        "r9",
-        "r10",
-        "r11",
-        "r12",
-        "r13",
-        "r14",
-        "r15",
-    ];
-
     const showMemory = (startAddr: number, highlightLength = 0) => {
         const endAddr = startAddr + 200;
         let memory = [];
@@ -80,110 +76,6 @@ const Canvas = () => {
         }
 
         setMemory(memory);
-    };
-
-    const is64BitRegister = (str: string) => {
-        const gpRegisters = [
-            "rax",
-            "rbx",
-            "rcx",
-            "rdx",
-
-            "rsi",
-            "rdi",
-
-            "rbp",
-            "rsp",
-        ];
-
-        const adgpRegisters = [
-            "r8",
-            "r9",
-            "r10",
-            "r11",
-            "r12",
-            "r13",
-            "r14",
-            "r15",
-        ];
-
-        const sppRegisters = ["rip", "rflags"];
-
-        return (
-            gpRegisters.includes(str) ||
-            adgpRegisters.includes(str) ||
-            sppRegisters.includes(str)
-        );
-    };
-
-    const is32BitRegister = (str: string) => {
-        const gpRegisters = [
-            "eax",
-            "ebx",
-            "ecx",
-            "edx",
-
-            "esi",
-            "edi",
-
-            "ebp",
-            "esp",
-        ];
-
-        const adgpRegisters = [
-            "r8d",
-            "r9d",
-            "r10d",
-            "r11d",
-            "r12d",
-            "r13d",
-            "r14d",
-            "r15d",
-        ];
-
-        return gpRegisters.includes(str) || adgpRegisters.includes(str);
-    };
-
-    const is16BitRegister = (str: string) => {
-        const gpRegisters = ["ax", "bx", "cx", "dx", "si", "di", "bp", "sp"];
-
-        const adgpRegisters = [
-            "r8w",
-            "r9w",
-            "r10w",
-            "r11w",
-            "r12w",
-            "r13w",
-            "r14w",
-            "r15w",
-        ];
-
-        return gpRegisters.includes(str) || adgpRegisters.includes(str);
-    };
-
-    const is8BitRegister = (str: string) => {
-        const gpRegistersLower = ["al", "bl", "cl", "dl"];
-        const gpRegistersHigher = ["ah", "bh", "ch", "dh"];
-
-        const idgpRegisters = ["sil", "dil"];
-
-        const adgpRegisters = [
-            "r8b",
-            "r9b",
-            "r10b",
-            "r11b",
-            "r12b",
-            "r13b",
-            "r14b",
-            "r15b",
-        ];
-
-        return (
-            gpRegistersLower.includes(str) ||
-            gpRegistersHigher.includes(str) ||
-            idgpRegisters.includes(str) ||
-            adgpRegisters.includes(str)
-        );
     };
 
     const isRegister = (str: string): boolean => {
@@ -289,27 +181,51 @@ const Canvas = () => {
     const push = (operand: any) => {
         if (isRegister(operand)) {
             intcpy(registers.rsp.data, registers[operand].data);
-            toast.info(" operand  is a register");
+            toast.info("operand  is a register");
         } else if (isMemoryAddress(operand)) {
-            toast.info(" operand  is a memory address");
+            toast.info("operand  is a memory address");
         } else if (isNumericValue(operand)) {
-            toast.info(" operand  is a value");
+            toast.info("operand  is a value");
             intcpy(registers.rsp.data, parseInt(operand));
         } else {
             toast.info(" Invalid operand");
         }
     };
+
     const mov = (src: any, dest: any) => {
-        if (isRegister(operand)) {
-            intcpy(registers.rsp.data, registers[operand].data);
-            toast.info(" operand  is a register");
-        } else if (isMemoryAddress(operand)) {
-            toast.info(" operand  is a memory address");
-        } else if (isNumericValue(operand)) {
-            toast.info(" operand  is a value");
-            intcpy(registers.rsp.data, parseInt(operand));
-        } else {
-            toast.info(" Invalid operand");
+        // src | dest : reg
+        if (isRegister(src) && isRegister(dest)) {
+            registers[dest].data = registers[src].data;
+        }
+
+        // src : reg | dest : mem addr
+        else if (isRegister(src) && isMemoryAddress(dest)) {
+            intcpy(dest, registers[src].data);
+        }
+
+        // src : mem |  dest : reg
+        else if (isMemoryAddress(src) && isRegister(dest)) {
+            intcpy(registers[dest].data, src);
+        }
+
+        // src | dest : mem addr
+        else if (isMemoryAddress(src) && isMemoryAddress(dest)) {
+            intcpy(dest, src);
+        }
+
+        // src : num value | dest : reg
+        else if (isNumericValue(src) && isRegister(dest)) {
+            intcpy(registers[src].data, parseInt(src));
+        }
+
+        // src : num value | dest : mem addr
+        else if (isNumericValue(src) && isMemoryAddress(dest)) {
+            intcpy(dest, parseInt(src));
+        }
+
+        // Invalid operation
+        else {
+            toast.info(" Invalid operands");
         }
     };
 
@@ -318,18 +234,6 @@ const Canvas = () => {
     const sub = (src: any, dest: any) => {};
     const cmp = (src: any, dest: any) => {};
 
-    const parseSingleLine = (instruction: string) => {
-        const [operation, operands] = instruction
-            .match(/(\S+)\s+(.*)/)
-            .slice(1);
-        const [operandOne, operandTwo] = operands.split(/[,\s]+/);
-
-        console.log("operation: " + operation);
-        console.log("operandOne: " + operandOne);
-        console.log("operandTwo: " + operandTwo);
-
-        return [operation, operandOne, operandTwo];
-    };
     const parseAssembly = () => {
         const instruction = formData.assemblyInput;
 
@@ -386,6 +290,22 @@ const Canvas = () => {
     return (
         <div className="w-full h-screen bg-[#2d3436] px-4">
             <ToastContainer />
+            {modalStatus.instructionModal && (
+                <Modal
+                    title="Instructions"
+                    handleClose={() => {
+                        closeModal("instructionModal");
+                    }}
+                >
+                    <AssemblyParser
+                        selectedDataItem={undefined}
+                        setInstructions={(cpuInstructions) => {
+                            setInstructions(cpuInstructions);
+                            closeModal("instructionModal");
+                        }}
+                    />
+                </Modal>
+            )}
             <div className="grid grid-cols-12 gap-2">
                 <div
                     className="h-screen  overflow-y-auto w-full col-span-2 "
@@ -407,16 +327,14 @@ const Canvas = () => {
                         ASSEMBLY INSTRUCTIONS
                     </h1>
                     <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg px-6 py-4">
-                        {cpuInstructions.map((line) => {
+                        {instructions.map((line: any) => {
                             return (
                                 <div className="flex py-1 px-2 border-b border-secondary hover:bg-primary text-slate-400 hover:text-secondary  cursor-pointer">
-                                    <div className="w-32">
-                                        {line.instruction}
-                                    </div>
+                                    <div className="w-32">{line.operation}</div>
                                     <div className="w-[300px]">
-                                        {line.operands[0]}
+                                        {line.operandOne}
                                     </div>
-                                    <div className="">{line.operands[1]}</div>
+                                    <div className="">{line.operandTwo}</div>
                                 </div>
                             );
                         })}
@@ -428,11 +346,13 @@ const Canvas = () => {
                             CONTROL EXECUTION
                         </h1>
                         <div className="px-2">
-                            <Button text="LOAD PROGRAM" handleClick={execute} />
                             <Button
-                                text="BREAKPOINTS"
-                                handleClick={parseAssembly}
+                                text="LOAD PROGRAM"
+                                handleClick={() => {
+                                    openModal("instructionModal");
+                                }}
                             />
+                            <Button text="BREAKPOINTS" handleClick={() => {}} />
                             <div className="grid grid-cols-2 gap-2">
                                 <Button
                                     text="BACK"
@@ -445,8 +365,15 @@ const Canvas = () => {
                             </div>
                             <Input
                                 name="assemblyInput"
+                                inputClassName="placeholder-gray-500"
+                                placeholder="Assembly instruction"
                                 value={formData.assemblyInput}
                                 handleChange={handleChange}
+                            />
+                            <Button
+                                className="-mt-1"
+                                text="EXECUTE"
+                                handleClick={parseAssembly}
                             />
                         </div>
                     </div>
