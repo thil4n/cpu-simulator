@@ -1,7 +1,16 @@
-import { Input } from "@components";
+import { Input, Select } from "@components";
+import { useForm } from "@hooks";
 
 
 const MemoryView = ({ startAddr, memoryValues, handleClose, step = 1 }) => {
+
+    const { formData, handleChange } = useForm({
+        assemblyInput: "",
+        addrInput: "",
+      });
+
+      
+
     const count = 20;
     let cells = [];
   
@@ -23,9 +32,13 @@ const MemoryView = ({ startAddr, memoryValues, handleClose, step = 1 }) => {
         
       <div className="w-full">
 
-        <Input name={""} value={""} handleChange={function (e: React.ChangeEvent<HTMLInputElement>): void {
-                throw new Error("Function not implemented.");
-            } } />
+        <div className="grid grid-cols-4 gap-2">
+
+        <Input placeholder="Start address" name={"startAddress"} value={""} handleChange={handleChange} />
+        <Input placeholder="Start address" name={"startAddress"} value={""} handleChange={handleChange} />
+        <Input placeholder="Start address" name={"startAddress"} value={""} handleChange={handleChange} />
+        <Select optList={[]} name={"startAddress"} value={""} handleChange={handleChange} />
+        </div>
         
       <div className="w-full p-2 flex flex-wrap gap-1 mt-4 mb-6">
         {cells.map((item) => (

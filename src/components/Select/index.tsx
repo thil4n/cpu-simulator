@@ -1,39 +1,15 @@
-import React, { useState, useEffect, useRef, ChangeEvent } from "react";
-import { HiOutlineX, HiOutlineChevronDown } from "react-icons/hi";
-
-interface Attribute {
-    _id?: string | null;
-    title: string;
-    type: string;
-    options?: Option[] | string[];
-}
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import { HiOutlineChevronDown, HiOutlineX } from "react-icons/hi";
 
 interface Option {
     id: string;
     title: string;
 }
 
-interface FormField {
-    id: string;
-    icon?: unknown;
-    required: boolean;
-    label: string;
-    data: number | string | string[] | object[] | null;
-    type: string;
-    error: string | null;
-    optList?: { id: string; title: string }[];
-    optTitle?: string;
-    cols?: number;
-    rows?: number;
-    multiple?: boolean;
-    min?: number;
-    max?: number;
-    placeHolderStr?: string;
-}
-
 interface SelectProps {
     name: string;
     value: string;
+    initValue?: Option | null;
     error?: string | null;
     label?: string;
     required?: boolean;
@@ -44,22 +20,20 @@ interface SelectProps {
     icon?: React.ReactNode;
     readOnly?: boolean;
     disabled?: boolean;
-    handleChange: () => void;
+    handleChange: (name: string, value: string | null) => void;
     inputClassName?: string;
     labelClassName?: string;
+    optList?: Option[];
 }
 
 const Select: React.FC<SelectProps> = ({
     name,
     value,
+    initValue = null,
     error = null,
     label = "",
     required = false,
-    min = 0,
-    max = null,
     placeholder = "",
-    type = "text",
-    icon = null,
     readOnly = false,
     disabled = false,
     handleChange,
@@ -68,18 +42,16 @@ const Select: React.FC<SelectProps> = ({
     optList = [],
 }) => {
     const [searchTerm, setSearchTerm] = useState("");
+    const [changed, setChanged] = useState(false);
     const [placeHolderStr, setPlaceHolderStr] = useState(
-        placeholder ? placeholder : "Search an item"
+        placeholder || "Search an item"
     );
     const [isDropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const dropdownRef = useRef(null);
-
-    const filteredOptions = optList
-        ? optList.filter((item) =>
-              item.title.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-        : [];
+    const filteredOptions = optList.filter((item: Option) =>
+        item.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const inputClasses = () => {
         let classes =
@@ -108,18 +80,23 @@ const Select: React.FC<SelectProps> = ({
     };
 
     useEffect(() => {
-        if (value) {
-            const selectedItem = optList.find((item) => {
-                return value === item.id;
-            });
-            setPlaceHolderStr(selectedItem.title);
+        if (initValue && value !== initValue.id && !changed) {
+            handleChange(name, initValue.id);
+            setPlaceHolderStr(initValue.title);
+        } else if (value && !initValue) {
+            const selectedItem = optList.find((item) => item.id === value);
+            if (selectedItem && placeHolderStr !== selectedItem.title) {
+                setPlaceHolderStr(selectedItem.title);
+            }
         }
+        // Add the event listener
         document.addEventListener("click", handleOutsideClick);
 
+        // Clean up the event listener
         return () => {
             document.removeEventListener("click", handleOutsideClick);
         };
-    }, []);
+    }, [initValue, value, name, handleChange, optList]);
 
     return (
         <div className="w-full flex flex-col mb-1 relative">
@@ -141,16 +118,16 @@ const Select: React.FC<SelectProps> = ({
                         setDropdownOpen(true);
                     }}
                     onFocus={() => setDropdownOpen(true)}
+                    readOnly={readOnly}
+                    disabled={disabled}
                 />
 
-                {(value || searchTerm.length !== 0) && (
+                {(value || searchTerm) && (
                     <span
                         className="absolute text-gray-800 right-10 top-4 cursor-pointer"
                         onClick={() => {
                             setSearchTerm("");
-                            setPlaceHolderStr(
-                                placeHolderStr || "Search an item"
-                            );
+                            setPlaceHolderStr(placeholder || "Search an item");
                             handleChange(name, null);
                         }}
                     >
@@ -162,12 +139,13 @@ const Select: React.FC<SelectProps> = ({
                     <HiOutlineChevronDown />
                 </span>
 
-                {isDropdownOpen && (
+                {isDropdownOpen && filteredOptions.length > 0 && (
                     <div className="w-full flex flex-col max-h-48 overflow-y-auto absolute bg-white border z-10">
                         {filteredOptions.map((item: Option) => (
                             <span
-                                className="px-3 py-3 hover:bg-slate-100  transition smooth border-b-[1px] border-slate-200  cursor-pointer w-full"
+                                className="px-3 py-3 hover:bg-slate-100  transition smooth border-b-[1px] border-slate-200 cursor-pointer w-full"
                                 onClick={() => {
+                                    setChanged(true);
                                     handleChange(name, item.id);
                                     setPlaceHolderStr(item.title);
                                     setSearchTerm("");
