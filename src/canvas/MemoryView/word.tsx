@@ -1,5 +1,3 @@
-import { Button } from "@components";
-
 const Word = ({ value }) => {
     const binaryString = value.toString(2).padStart(64, "0");
     const bytes = [];

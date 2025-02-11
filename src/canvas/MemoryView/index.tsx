@@ -1,5 +1,3 @@
-import { Button } from "@components";
-
 const MemoryView = ({ startAddr, memoryValues, handleClose }) => {
     const count = 20;
     const x = 1 ? 1 : 8;
@@ -39,10 +37,10 @@ const MemoryView = ({ startAddr, memoryValues, handleClose }) => {
                                 e.stopPropagation();
                             }}
                         >
-                            <div className=" bg-primary text-secondary text-center font-bold text-xl pl-3 w-full py-2 uppercase">
+                            <div className=" bg-primary text-secondary text-center font-bold pl-3 w-full py-1 uppercase">
                                 Examine Memory
                             </div>
-                            <div className="w-full px-2 grid grid-cols-8 gap-2 mt-4 mb-6">
+                            <div className="w-full px-2 grid grid-cols-8 gap-1 mt-4 mb-6">
                                 {cells.map((item) => {
                                     return (
                                         <div
