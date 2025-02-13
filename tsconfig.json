@@ -9,7 +9,7 @@
         "paths": {
             "@components": ["src/components"],
             "@utils": ["src/utils"],
-            "@services": ["src/services/"],
+            "@interfaces": ["src/interfaces/"],
             "@hooks": ["src/hooks/"],
             "@config": ["src/config/"],
             "@assets": ["src/assets/"]

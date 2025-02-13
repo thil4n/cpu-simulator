@@ -1,12 +1,4 @@
-interface Register {
-    key: string;
-    data: number | null;
-    desc: string;
-}
-
-interface CacheMem {
-    [key: string]: Register;
-}
+import { CacheMem } from "@interfaces";
 
 const registers: CacheMem = {
     rax: { key: "rax", data: null, desc: "Accumulator Register" },

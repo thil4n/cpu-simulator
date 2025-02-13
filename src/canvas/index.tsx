@@ -30,8 +30,8 @@ const Canvas = () => {
     addrInput: "",
   });
 
-  const [memory, setMemory] = useState([]);
-  const [memoryValues, memset] = useState({});
+  const [memory, memset] = useState({});
+  const [memoryRange, setMemRange] = useState([]);
 
   interface Register {
     key: string;
@@ -74,16 +74,14 @@ const Canvas = () => {
 
   const showMemory = (startAddr: number, highlightLength = 0) => {
     const endAddr = startAddr + 200;
-    let memory = [];
-
+    let memRange = [];
     for (let index = startAddr; index < endAddr; index += 8) {
-      memory.push({
+      memRange.push({
         address: index,
         highlight: index - startAddr < highlightLength,
       });
     }
-
-    setMemory(memory);
+    setMemRange(memRange);
   };
 
   const is64BitRegister = (str: string) => {
@@ -409,7 +407,7 @@ const Canvas = () => {
             startAddr={examineMemory?.startAddress}
             wordCount={examineMemory?.wordCount}
             handleClose={() => setExamineMemory(null)}
-            memoryValues={memoryValues}
+            memoryValues={memory}
           />
         </Modal>
       )}
@@ -418,7 +416,7 @@ const Canvas = () => {
           className="h-screen  overflow-y-auto w-full col-span-2 "
           id="style-1"
         >
-          {memory.map((cell) => {
+          {memoryRange.map((cell) => {
             return (
               <MemoryCell
                 cell={cell}
@@ -426,7 +424,7 @@ const Canvas = () => {
                 handleExamineMemory={() => {
                   openModal("memoryModal");
                 }}
-                value={memoryValues[cell.address]}
+                value={memory[cell.address]}
               />
             );
           })}
