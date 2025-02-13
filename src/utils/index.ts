@@ -152,7 +152,7 @@ export const parseSingleLine = (line: string) => {
   return { operation, operandOne, operandTwo };
 };
 
-
-export const parseAddr = ( address:String) => {
-    return parseInt(address.substring(2));
-}
+export const parseAddr = (address: string) => {
+    return parseInt(address.substring(2), 16);
+  }
+  

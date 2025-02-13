@@ -103,12 +103,12 @@ const Canvas = () => {
     console.log(dest);
 
     const memoryValuesCopy = { ...memory };
-    const binaryString = value.toString(2).padStart(64, "0");
+    const binaryString = value.toString(2).padStart(32, "0");
 
-    for (let i = 0; i < 8; i++) {
-      const byteString = binaryString.slice(i * 8, (i + 1) * 8);
+    for (let i = 0; i < 4; i++) {
+      const byteString = binaryString.slice(i * 4, (i + 1) * 4);
 
-      memoryValuesCopy[dest + 7 - i] = byteString;
+      memoryValuesCopy[dest + 3 - i] = byteString;
     }
 
     memset(memoryValuesCopy);
