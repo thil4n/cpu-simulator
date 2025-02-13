@@ -8,6 +8,13 @@ import MemoryCell from "./MemoryCell";
 import MemoryView from "./MemoryView";
 import { useForm, useModal } from "@hooks";
 import AssemblyParser from "./AssemblyParser";
+import {
+  isMemoryAddress,
+  isNumericValue,
+  isRegister,
+  parseAddr,
+  parseSingleLine,
+} from "@utils";
 
 interface ExamineMemory {
   startAddress: null;
@@ -84,174 +91,6 @@ const Canvas = () => {
     setMemRange(memRange);
   };
 
-  const is64BitRegister = (str: string) => {
-    const gpRegisters = [
-      "rax",
-      "rbx",
-      "rcx",
-      "rdx",
-
-      "rsi",
-      "rdi",
-
-      "rbp",
-      "rsp",
-    ];
-
-    const adgpRegisters = [
-      "r8",
-      "r9",
-      "r10",
-      "r11",
-      "r12",
-      "r13",
-      "r14",
-      "r15",
-    ];
-
-    const sppRegisters = ["rip", "rflags"];
-
-    return (
-      gpRegisters.includes(str) ||
-      adgpRegisters.includes(str) ||
-      sppRegisters.includes(str)
-    );
-  };
-
-  const is32BitRegister = (str: string) => {
-    const gpRegisters = [
-      "eax",
-      "ebx",
-      "ecx",
-      "edx",
-
-      "esi",
-      "edi",
-
-      "ebp",
-      "esp",
-    ];
-
-    const adgpRegisters = [
-      "r8d",
-      "r9d",
-      "r10d",
-      "r11d",
-      "r12d",
-      "r13d",
-      "r14d",
-      "r15d",
-    ];
-
-    return gpRegisters.includes(str) || adgpRegisters.includes(str);
-  };
-
-  const is16BitRegister = (str: string) => {
-    const gpRegisters = ["ax", "bx", "cx", "dx", "si", "di", "bp", "sp"];
-
-    const adgpRegisters = [
-      "r8w",
-      "r9w",
-      "r10w",
-      "r11w",
-      "r12w",
-      "r13w",
-      "r14w",
-      "r15w",
-    ];
-
-    return gpRegisters.includes(str) || adgpRegisters.includes(str);
-  };
-
-  const is8BitRegister = (str: string) => {
-    const gpRegistersLower = ["al", "bl", "cl", "dl"];
-    const gpRegistersHigher = ["ah", "bh", "ch", "dh"];
-
-    const idgpRegisters = ["sil", "dil"];
-
-    const adgpRegisters = [
-      "r8b",
-      "r9b",
-      "r10b",
-      "r11b",
-      "r12b",
-      "r13b",
-      "r14b",
-      "r15b",
-    ];
-
-    return (
-      gpRegistersLower.includes(str) ||
-      gpRegistersHigher.includes(str) ||
-      idgpRegisters.includes(str) ||
-      adgpRegisters.includes(str)
-    );
-  };
-
-  const isRegister = (str: string): boolean => {
-    const registers = [
-      "rax",
-      "rbx",
-      "rcx",
-      "rdx",
-      "rsi",
-      "rdi",
-      "rbp",
-      "rsp",
-      "r8",
-      "r9",
-      "r10",
-      "r11",
-      "r12",
-      "r13",
-      "r14",
-      "r15",
-      "eax",
-      "ebx",
-      "ecx",
-      "edx",
-      "esi",
-      "edi",
-      "ebp",
-      "esp",
-      "ax",
-      "bx",
-      "cx",
-      "dx",
-      "si",
-      "di",
-      "bp",
-      "sp",
-      "al",
-      "bl",
-      "cl",
-      "dl",
-      "ah",
-      "bh",
-      "ch",
-      "dh",
-      "sil",
-      "dil",
-      "r8b",
-      "r9b",
-      "r10b",
-      "r11b",
-      "r12b",
-      "r13b",
-      "r14b",
-      "r15b",
-    ];
-    return registers.includes(str.toLowerCase());
-  };
-
-  const isNumericValue = (str: string): boolean => {
-    return /^[0-9]+$/.test(str);
-  };
-
-  const isMemoryAddress = (str: string): boolean => {
-    return /^0x[0-9a-fA-F]+$/.test(str);
-  };
-
   const handleClickRegister = (register: SetStateAction<null>) => {
     setSelectedRegister(register);
   };
@@ -261,7 +100,9 @@ const Canvas = () => {
   const accessMemory = (src: any, dest: any) => {};
 
   const intcpy = (dest: number, value: number) => {
-    const memoryValuesCopy = { ...memoryValues };
+    console.log(dest);
+
+    const memoryValuesCopy = { ...memory };
     const binaryString = value.toString(2).padStart(64, "0");
 
     for (let i = 0; i < 8; i++) {
@@ -271,8 +112,6 @@ const Canvas = () => {
     }
 
     memset(memoryValuesCopy);
-
-    console.log(registers.rsp.data);
   };
 
   const strcpy = (dest: number, string: string) => {
@@ -330,7 +169,8 @@ const Canvas = () => {
 
     // src : num value | dest : mem addr
     else if (isNumericValue(src) && isMemoryAddress(dest)) {
-      intcpy(dest, parseInt(src));
+      intcpy(parseAddr(dest), parseInt(src));
+      console.info(`Moving the value ${src} into ${parseAddr(dest)}.`);
     }
 
     // Invalid operation
@@ -347,7 +187,11 @@ const Canvas = () => {
   const parseAssembly = () => {
     const instruction = formData.assemblyInput;
 
-    const [operation, operandOne, operandTwo] = parseSingleLine(instruction);
+    const { operation, operandOne, operandTwo } = parseSingleLine(instruction);
+
+    console.info(
+      `Operation : ${operation} |  Operand One : ${operandOne} | Operand Two : ${operandTwo}`
+    );
 
     switch (operation) {
       case "mov":
@@ -368,7 +212,7 @@ const Canvas = () => {
   };
 
   useEffect(() => {
-    showMemory(20000);
+    showMemory(1000);
   }, []);
 
   const execute = () => {
@@ -527,11 +371,36 @@ const Canvas = () => {
                     showMemory(rbp, stackLength);
                   }}
                 />
-                <Button text={"Heap"} />
-                <Button text={".BSS"} />
-                <Button text={".TXT"} />
-                <Button text={".DATA"} />
-                <Button text={"Address"} />
+                <Button
+                  text={"Heap"}
+                  handleClick={function (): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                />
+                <Button
+                  text={".BSS"}
+                  handleClick={function (): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                />
+                <Button
+                  text={".TXT"}
+                  handleClick={function (): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                />
+                <Button
+                  text={".DATA"}
+                  handleClick={function (): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                />
+                <Button
+                  text={"Address"}
+                  handleClick={function (): void {
+                    throw new Error("Function not implemented.");
+                  }}
+                />
               </div>
               <div className="  grid grid-cols-2 gap-2">
                 <Button
