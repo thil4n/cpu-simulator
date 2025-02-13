@@ -9,10 +9,9 @@ import MemoryView from "./MemoryView";
 import { useForm, useModal } from "@hooks";
 import AssemblyParser from "./AssemblyParser";
 
-
 interface ExamineMemory {
-    startAddress: null,
-    wordCount:null
+  startAddress: null;
+  wordCount: null;
 }
 
 const Canvas = () => {
@@ -404,7 +403,7 @@ const Canvas = () => {
             closeModal("memoryModal");
           }}
           title={"Examine Memory"}
-          className="w-[80%] text-secondary"
+          className="w-[90%] text-secondary"
         >
           <MemoryView
             startAddr={examineMemory?.startAddress}

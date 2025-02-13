@@ -53,7 +53,7 @@ const Input: React.FC<InputProps> = ({
     };
 
     const labelClasses = (): string => {
-        let classes = "mb-2 flex ";
+        let classes = "mb-1 flex ";
         classes += labelClassName;
         return classes;
     };
