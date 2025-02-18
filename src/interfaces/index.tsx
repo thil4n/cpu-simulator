@@ -17,3 +17,8 @@ export interface Instruction {
 export interface AssemblyParserProps {
   setInstructions: React.Dispatch<React.SetStateAction<Instruction[]>>;
 }
+
+export interface Memory {
+  index: number;
+  value;
+}

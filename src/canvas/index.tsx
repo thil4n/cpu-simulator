@@ -17,13 +17,15 @@ import {
 } from "@utils";
 
 interface ExamineMemory {
-  startAddress: null;
-  wordCount: null;
+  startAddress: number;
+  wordCount: number;
 }
 
 const Canvas = () => {
   const [selectedRegister, setSelectedRegister] = useState(null);
-  const [examineMemory, setExamineMemory] = useState<ExamineMemory>();
+  const [examineMemory, setExamineMemory] = useState<ExamineMemory | null>(
+    null
+  );
   const [instructions, setInstructions] = useState([]);
 
   const { modalStatus, openModal, closeModal } = useModal({
@@ -37,7 +39,7 @@ const Canvas = () => {
     addrInput: "",
   });
 
-  const [memory, memset] = useState({});
+  const [memory, memset] = useState<Record<number, number>>({});
   const [memoryRange, setMemRange] = useState([]);
 
   interface Register {
@@ -100,31 +102,35 @@ const Canvas = () => {
   const accessMemory = (src: any, dest: any) => {};
 
   const intcpy = (dest: number, value: number) => {
-    console.log(dest);
-
     const memoryValuesCopy = { ...memory };
-    const binaryString = value.toString(2).padStart(32, "0");
 
+    // Create a buffer of 4 bytes (32-bit) and a DataView to write int32
+    const buffer = new ArrayBuffer(4);
+    const view = new DataView(buffer);
+
+    // Store the value as a signed 32-bit integer
+    view.setInt32(0, value, true); // true for little-endian
+
+    // Store each byte in memory
     for (let i = 0; i < 4; i++) {
-      const byteString = binaryString.slice(i * 4, (i + 1) * 4);
-
-      memoryValuesCopy[dest + 3 - i] = byteString;
+      memoryValuesCopy[dest + i] = view.getUint8(i);
     }
 
     memset(memoryValuesCopy);
   };
 
-  const strcpy = (dest: number, string: string) => {
-    const memoryValuesCopy = { ...memoryValues };
-    const binaryString = value.toString(2).padStart(64, "0");
+  const strcpy = (dest: number, str: string) => {
+    const memoryValuesCopy = { ...memory };
 
-    for (let i = 0; i < 8; i++) {
-      const byteString = binaryString.slice(i * 8, (i + 1) * 8);
-
-      memoryValuesCopy[dest + 7 - i] = byteString;
+    for (let i = 0; i < str.length; i++) {
+      memoryValuesCopy[dest + i] = str.charCodeAt(i);
     }
 
+    // Null-terminate the string
+    memoryValuesCopy[dest + str.length] = 0;
+
     memset(memoryValuesCopy);
+    console.log(memoryValuesCopy);
   };
 
   const push = (operand: any) => {
@@ -141,36 +147,36 @@ const Canvas = () => {
     }
   };
 
-  const mov = (src: any, dest: any) => {
-    // src | dest : reg
-    if (isRegister(src) && isRegister(dest)) {
-      registers[dest].data = registers[src].data;
+  const mov = (op_1: any, op_2: any) => {
+    // op_1 | op_2 : reg
+    if (isRegister(op_1) && isRegister(op_2)) {
+      registers[op_2].data = registers[op_1].data;
     }
 
-    // src : reg | dest : mem addr
-    else if (isRegister(src) && isMemoryAddress(dest)) {
-      intcpy(dest, registers[src].data);
+    // op_1 : reg | op_2 : mem addr
+    else if (isRegister(op_1) && isMemoryAddress(op_2)) {
+      intcpy(op_2, registers[op_1].data);
     }
 
-    // src : mem |  dest : reg
-    else if (isMemoryAddress(src) && isRegister(dest)) {
-      intcpy(registers[dest].data, src);
+    // op_1 : mem |  op_2 : reg
+    else if (isMemoryAddress(op_1) && isRegister(op_2)) {
+      intcpy(registers[op_2].data, op_1);
     }
 
-    // src | dest : mem addr
-    else if (isMemoryAddress(src) && isMemoryAddress(dest)) {
-      intcpy(dest, src);
+    // op_1 | op_2 : mem addr
+    else if (isMemoryAddress(op_1) && isMemoryAddress(op_2)) {
+      intcpy(op_2, op_1);
     }
 
-    // src : num value | dest : reg
-    else if (isNumericValue(src) && isRegister(dest)) {
-      intcpy(registers[src].data, parseInt(src));
+    // op_1 : num value | op_2 : reg
+    else if (isNumericValue(op_1) && isRegister(op_2)) {
+      intcpy(registers[op_1].data, parseInt(op_1));
     }
 
-    // src : num value | dest : mem addr
-    else if (isNumericValue(src) && isMemoryAddress(dest)) {
-      intcpy(parseAddr(dest), parseInt(src));
-      console.info(`Moving the value ${src} into ${parseAddr(dest)}.`);
+    // op_1 : num value | op_2 : mem addr
+    else if (isNumericValue(op_1) && isMemoryAddress(op_2)) {
+      intcpy(parseAddr(op_2), parseInt(op_1));
+      console.info(`Moving the value ${op_1} into ${parseAddr(op_2)}.`);
     }
 
     // Invalid operation
@@ -239,19 +245,19 @@ const Canvas = () => {
         </Modal>
       )}
 
-      {modalStatus.memoryModal && (
+      {modalStatus.memoryModal && examineMemory && (
         <Modal
           handleClose={() => {
             closeModal("memoryModal");
+            setExamineMemory(null);
           }}
           title={"Examine Memory"}
           className="w-[90%] text-secondary"
         >
           <MemoryView
-            startAddr={examineMemory?.startAddress}
+            startAddress={examineMemory?.startAddress}
             wordCount={examineMemory?.wordCount}
-            handleClose={() => setExamineMemory(null)}
-            memoryValues={memory}
+            memory={memory}
           />
         </Modal>
       )}
@@ -266,6 +272,10 @@ const Canvas = () => {
                 cell={cell}
                 key={Math.random()}
                 handleExamineMemory={() => {
+                  setExamineMemory({
+                    startAddress: cell.address,
+                    wordCount: 8,
+                  });
                   openModal("memoryModal");
                 }}
                 value={memory[cell.address]}

@@ -7,10 +7,10 @@ interface Cell {
   value: number;
 }
 
-const MemoryView = ({ memoryValues }) => {
+const MemoryView = ({ startAddress, wordCount, memory }) => {
   const { formData, handleChange } = useForm({
-    startAddress: "1000",
-    wordCount: "24",
+    startAddress: startAddress || 2000,
+    wordCount: wordCount || 24,
     wordSize: "1",
     displayType: "hexadecimal",
   });
@@ -25,16 +25,32 @@ const MemoryView = ({ memoryValues }) => {
     end: null,
   });
 
+  const formatValue = (value: number, displayType: string): string => {
+    switch (displayType) {
+      case "hexadecimal":
+        return value.toString(16).padStart(2, "0").toUpperCase();
+      case "binary":
+        return value.toString(2).padStart(8, "0");
+      case "octal":
+        return value.toString(8);
+      case "decimal":
+        return value.toString(10);
+      default:
+        return value.toString(16).padStart(2, "0").toUpperCase();
+    }
+  };
+
   const buildMemoryView = () => {
     let cells = [];
 
-    for (let i = 0; i < formData.wordCount; i++) {
-      const address = formData.startAddress + i * formData.wordSize;
+    for (let i = 0; i < parseInt(formData.wordCount); i++) {
+      const address =
+        parseInt(formData.startAddress) + i * parseInt(formData.wordSize);
 
-      // Convert binary string to hexadecimal, fallback to "00" if undefined
-      const value = memoryValues[address]
-        ? parseInt(memoryValues[address], 2).toString(16).padStart(2, "0")
-        : "00";
+      // Fallback to 0 if undefined
+      const value = memory[address] ? parseInt(memory[address], 2) : 0;
+
+      console.log(parseInt(memory[address]));
 
       cells.push({
         address,
@@ -143,28 +159,27 @@ const MemoryView = ({ memoryValues }) => {
           <div
             key={memoryCell.address}
             className={`cursor-pointer text-sm p-2 text-center border border-gray-500 rounded-sm 
-              ${
-                isSelected(memoryCell.address)
-                  ? "bg-blue-400 text-white"
-                  : "bg-primary text-secondary"
-              }
-              ${
-                formData.wordSize == 8
-                  ? "col-span-8"
-                  : formData.wordSize == 4
-                  ? "col-span-4"
-                  : formData.wordSize == 2
-                  ? "col-span-2"
-                  : "col-span-1"
-              }
-
-              hover:bg-secondary hover:text-white`}
-            // onClick={() => handleCellClick(memoryCell.address)}
+      ${
+        isSelected(memoryCell.address)
+          ? "bg-blue-400 text-white"
+          : "bg-primary text-secondary"
+      }
+      ${
+        formData.wordSize == 8
+          ? "col-span-8"
+          : formData.wordSize == 4
+          ? "col-span-4"
+          : formData.wordSize == 2
+          ? "col-span-2"
+          : "col-span-1"
+      }
+      hover:bg-secondary hover:text-white`}
             onMouseEnter={() => {
               handleHover(memoryCell);
             }}
           >
-            0x{memoryCell.value}
+            {formData.displayType === "hexadecimal" ? "0x" : ""}
+            {formatValue(memoryCell.value, formData.displayType)}
           </div>
         ))}
       </div>
