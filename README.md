@@ -1,30 +1,62 @@
-# React + TypeScript + Vite
+# CPU Simulator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+CPU Simulator is a project implemented in TypeScript, designed to simulate the functionality of a CPU. This project aims to help understand the inner workings of a CPU by providing a simulated environment where various CPU operations can be tested and analyzed.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Simulate basic CPU operations such as arithmetic, logic, and control instructions.
+- Register and memory management.
+- Fetch-decode-execute cycle simulation.
+- Support for custom instruction sets.
+- Visualization of CPU state and operation flow.
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### Prerequisites
 
-- Configure the top-level `parserOptions` property like this:
+- Node.js (version 14 or higher)
+- npm (Node package manager)
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+### Installation
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/thil4n/cpu-simulator.git
+    ```
+
+2. Navigate to the project directory:
+    ```bash
+    cd cpu-simulator
+    ```
+
+3. Install the dependencies:
+    ```bash
+    npm install
+    ```
+
+### Running the Simulator
+
+To start the CPU simulator, run:
+```bash
+npm start
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Usage
+
+Explain how to use the CPU simulator here. Include examples and screenshots if necessary.
+
+## Contributing
+
+Contributions are welcome! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) for details on the code of conduct and the process for submitting pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgements
+
+- List any resources or inspirations for your project.
+
+## Contact
+
+For any inquiries, please contact [thil4n](https://github.com/thil4n).
