@@ -156,7 +156,7 @@ const Canvas = () => {
       intcpy(registers.rsp.data, parseInt(operand));
       consoleLog(`Pushing the value : ${operand}  onto the stack.`);
     } else {
-      consoleError("Invalid operand");
+      consoleError("Invalid operand given for the push operation.");
     }
   };
 
