@@ -2,7 +2,7 @@ import { useState, useEffect, SetStateAction } from "react";
 import { ToastContainer } from "react-toastify";
 import { toast } from "react-toastify";
 
-import { Button, Input, Modal } from "@components";
+import { Button, Input, Loader, Modal } from "@components";
 
 import MemoryCell from "./MemoryCell";
 import MemoryView from "./MemoryView";
@@ -15,6 +15,7 @@ import {
   parseAddr,
   parseSingleLine,
 } from "@utils";
+import Console from "./Console";
 
 interface ExamineMemory {
   startAddress: number;
@@ -41,6 +42,16 @@ const Canvas = () => {
 
   const [memory, memset] = useState<Record<number, number>>({});
   const [memoryRange, setMemRange] = useState([]);
+
+  const [logs, setLogs] = useState([]);
+
+  const consoleLog = (message) => {
+    setLogs((prevLogs) => [...prevLogs, { type: "log", message }]);
+  };
+
+  const consoleError = (message) => {
+    setLogs((prevLogs) => [...prevLogs, { type: "error", message }]);
+  };
 
   interface Register {
     key: string;
@@ -136,14 +147,16 @@ const Canvas = () => {
   const push = (operand: any) => {
     if (isRegister(operand)) {
       intcpy(registers.rsp.data, registers[operand].data);
-      toast.info("operand  is a register");
+      consoleLog(`Pushing the value of ${operand} register onto the stack.`);
     } else if (isMemoryAddress(operand)) {
-      toast.info("operand  is a memory address");
+      consoleLog(
+        `Pushing the value from the address ${operand}  onto the stack.`
+      );
     } else if (isNumericValue(operand)) {
-      toast.info("operand  is a value");
       intcpy(registers.rsp.data, parseInt(operand));
+      consoleLog(`Pushing the value : ${operand}  onto the stack.`);
     } else {
-      toast.info("Invalid operand");
+      consoleError("Invalid operand");
     }
   };
 
@@ -151,32 +164,37 @@ const Canvas = () => {
     // op_1 | op_2 : reg
     if (isRegister(op_1) && isRegister(op_2)) {
       registers[op_2].data = registers[op_1].data;
+      consoleLog(`Moving the value ${op_1} into ${parseAddr(op_2)}.`);
     }
 
     // op_1 : reg | op_2 : mem addr
     else if (isRegister(op_1) && isMemoryAddress(op_2)) {
       intcpy(op_2, registers[op_1].data);
+      consoleLog(`Moving the value ${op_1} into ${parseAddr(op_2)}.`);
     }
 
     // op_1 : mem |  op_2 : reg
     else if (isMemoryAddress(op_1) && isRegister(op_2)) {
       intcpy(registers[op_2].data, op_1);
+      consoleLog(`Moving the value ${op_1} into ${parseAddr(op_2)}.`);
     }
 
     // op_1 | op_2 : mem addr
     else if (isMemoryAddress(op_1) && isMemoryAddress(op_2)) {
       intcpy(op_2, op_1);
+      consoleLog(`Moving the value ${op_1} into ${parseAddr(op_2)}.`);
     }
 
     // op_1 : num value | op_2 : reg
     else if (isNumericValue(op_1) && isRegister(op_2)) {
       intcpy(registers[op_1].data, parseInt(op_1));
+      consoleLog(`Moving the value ${op_1} into ${parseAddr(op_2)}.`);
     }
 
     // op_1 : num value | op_2 : mem addr
     else if (isNumericValue(op_1) && isMemoryAddress(op_2)) {
       intcpy(parseAddr(op_2), parseInt(op_1));
-      console.info(`Moving the value ${op_1} into ${parseAddr(op_2)}.`);
+      consoleLog(`Moving the value ${op_1} into ${parseAddr(op_2)}.`);
     }
 
     // Invalid operation
@@ -195,8 +213,10 @@ const Canvas = () => {
 
     const { operation, operandOne, operandTwo } = parseSingleLine(instruction);
 
-    console.info(
-      `Operation : ${operation} |  Operand One : ${operandOne} | Operand Two : ${operandTwo}`
+    consoleLog(
+      `Operation : ${operation} |  Operand One : ${operandOne} ${
+        operandTwo ? " | Operand Two : " + operandTwo : ""
+      }`
     );
 
     switch (operation) {
@@ -224,6 +244,8 @@ const Canvas = () => {
   const execute = () => {
     parseAssembly();
   };
+
+  const [loadingState, setLoadingState] = useState(false);
 
   return (
     <div className="w-full h-screen bg-[#2d3436] px-4">
@@ -283,58 +305,65 @@ const Canvas = () => {
             );
           })}
         </div>
-        <div className="w-full col-span-5 mt-5">
-          <h1 className="bg-primary text-secondary w-full py-2 text-center uppercase">
-            ASSEMBLY INSTRUCTIONS
-          </h1>
-          <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg px-6 py-4">
-            {instructions.map((line: any) => {
-              return (
-                <div className="flex py-1 px-2 border-b border-secondary hover:bg-primary text-slate-400 hover:text-secondary  cursor-pointer">
-                  <div className="w-32">{line.operation}</div>
-                  <div className="w-[300px]">{line.operandOne}</div>
-                  <div className="">{line.operandTwo}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        <div className="w-full col-span-2 mt-5">
-          <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg">
-            <h1 className="bg-primary text-secondary w-full py-2 text-center uppercase mb-3">
-              CONTROL EXECUTION
-            </h1>
-            <div className="px-2">
-              <Button
-                text="LOAD PROGRAM"
-                handleClick={() => {
-                  openModal("instructionModal");
-                }}
-              />
-              <Button text="BREAKPOINTS" handleClick={() => {}} />
-              <div className="grid grid-cols-2 gap-2">
-                <Button text="BACK" handleClick={parseAssembly} />
-                <Button text="NEXT" handleClick={parseAssembly} />
+        <div className="relative min-h-screen flex flex-col col-span-7 w-full">
+          <div className="grid grid-cols-7 gap-2">
+            <div className="w-full col-span-5 mt-5">
+              <h1 className="bg-primary text-secondary w-full py-1 text-md text-center uppercase">
+                ASSEMBLY INSTRUCTIONS
+              </h1>
+              <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg px-6 py-4">
+                {instructions.map((line: any) => {
+                  return (
+                    <div className="flex py-1 px-2 border-b border-secondary hover:bg-primary text-slate-400 hover:text-secondary  cursor-pointer">
+                      <div className="w-32">{line.operation}</div>
+                      <div className="w-[300px]">{line.operandOne}</div>
+                      <div className="">{line.operandTwo}</div>
+                    </div>
+                  );
+                })}
               </div>
-              <Input
-                name="assemblyInput"
-                inputClassName="placeholder-gray-500"
-                placeholder="Assembly instruction"
-                value={formData.assemblyInput}
-                handleChange={handleChange}
-              />
-              <Button
-                className="-mt-1"
-                text="EXECUTE"
-                handleClick={parseAssembly}
-              />
             </div>
+            <div className="w-full col-span-2 mt-5">
+              <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg">
+                <h1 className="bg-primary text-secondary w-full py-1 text-md text-center uppercase mb-3">
+                  CONTROL EXECUTION
+                </h1>
+                <div className="px-2">
+                  <Button
+                    text="LOAD PROGRAM"
+                    handleClick={() => {
+                      openModal("instructionModal");
+                    }}
+                  />
+                  <Button text="BREAKPOINTS" handleClick={() => {}} />
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button text="BACK" handleClick={parseAssembly} />
+                    <Button text="NEXT" handleClick={parseAssembly} />
+                  </div>
+                  <Input
+                    name="assemblyInput"
+                    inputClassName="placeholder-gray-500"
+                    placeholder="Assembly instruction"
+                    value={formData.assemblyInput}
+                    handleChange={handleChange}
+                  />
+                  <Button
+                    className="-mt-1"
+                    text="EXECUTE"
+                    handleClick={parseAssembly}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="absolute bottom-1 w-full">
+            <Console logs={logs} />
           </div>
         </div>
 
         <div className="w-full col-span-3">
           <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg mb-5 mt-5">
-            <h1 className="bg-primary  text-secondary w-full py-2 text-center uppercase">
+            <h1 className="bg-primary  text-secondary w-full py-1 text-md text-center uppercase">
               CPU REGISTERS
             </h1>
             <div className="grid grid-cols-3 gap-1 mt-3 px-2">
@@ -367,7 +396,7 @@ const Canvas = () => {
             </div>
           </div>
           <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg">
-            <h1 className="bg-primary text-secondary w-full py-2 text-center uppercase">
+            <h1 className="bg-primary text-secondary w-full py-1 text-md text-center uppercase">
               Examine Memory
             </h1>
             <div className="px-2 py2 mt-3">
@@ -433,9 +462,7 @@ const Canvas = () => {
         </div>
       </div>
 
-      {/* {loadingState && (
-                <Loader handleClose={() => setLoadingState(false)} />
-            )} */}
+      {loadingState && <Loader handleClose={() => setLoadingState(false)} />}
     </div>
   );
 };
