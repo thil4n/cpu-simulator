@@ -13,7 +13,7 @@ interface LoggerContextType {
 
 const LoggerContext = createContext<LoggerContextType | undefined>(undefined);
 
-export const MemoryProvider = ({ children }: { children: ReactNode }) => {
+export const LoggerProvider = ({ children }: { children: ReactNode }) => {
   const [logs, setLogs] = useState<Log[]>([]);
 
   const info = (message: string) => {
@@ -34,7 +34,7 @@ export const MemoryProvider = ({ children }: { children: ReactNode }) => {
 export const useLoggerContext = () => {
   const context = useContext(LoggerContext);
   if (!context) {
-    throw new Error("useLoggerContext must be used within a MemoryProvider");
+    throw new Error("useLoggerContext must be used within a LoggerProvider");
   }
   return context;
 };
