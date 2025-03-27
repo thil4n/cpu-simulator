@@ -4,11 +4,14 @@ import "./assets/css/main.css";
 import Canvas from "./canvas";
 
 import { MemoryProvider } from "@context/MemoryContext";
+import { LoggerProvider } from "@context/LoggerContext";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <MemoryProvider>
-      <Canvas />
-    </MemoryProvider>
+    <LoggerProvider>
+      <MemoryProvider>
+        <Canvas />
+      </MemoryProvider>
+    </LoggerProvider>
   </React.StrictMode>
 );
