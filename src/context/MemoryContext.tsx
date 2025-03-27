@@ -3,6 +3,9 @@ import { createContext, useContext, useState, ReactNode } from "react";
 interface CacheMemory {
   [key: string]: number | null;
 }
+interface Memory {
+  [key: number]: number | null;
+}
 
 const initialRegisters: CacheMemory = {
   rax: null, // Accumulator Register
@@ -35,7 +38,11 @@ const adgpRegisters = ["r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15"];
 
 interface MemoryContextType {
   registers: CacheMemory;
-  setRegister: (key: string, value: number | null) => void;
+  regset: (key: string, value: number | null) => void;
+
+  memory: Memory;
+  memset: (key: number, value: number | null) => void;
+
   gpRegisters: string[];
   adgpRegisters: string[];
 }
@@ -44,16 +51,25 @@ const MemoryContext = createContext<MemoryContextType | undefined>(undefined);
 
 export const MemoryProvider = ({ children }: { children: ReactNode }) => {
   const [registers, setRegisters] = useState<CacheMemory>(initialRegisters);
+  const [memory, setMemory] = useState<Memory>(initialRegisters);
 
-  const setRegister = (key: string, value: number | null) => {
-    // setRegisters((prev) => ({
-    //   ...prev,
-    //   [key]: { ...prev[key], data: value },
-    // }));
+  const regset = (key: string, value: number | null) => {
+    setRegisters((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
   };
+
+  const memset = (key: number, value: number | null) => {
+    setMemory((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
   return (
     <MemoryContext.Provider
-      value={{ registers, setRegister, gpRegisters, adgpRegisters }}
+      value={{ registers, regset, memory, memset, gpRegisters, adgpRegisters }}
     >
       {children}
     </MemoryContext.Provider>
