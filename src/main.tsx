@@ -3,8 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./assets/css/main.css";
 import Canvas from "./canvas";
 
-import { MemoryProvider } from "@context/MemoryContext";
-import { LoggerProvider } from "@context/LoggerContext";
+import { MemoryProvider, LoggerProvider } from "@context";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
