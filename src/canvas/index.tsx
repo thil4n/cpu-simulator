@@ -7,6 +7,7 @@ import MemoryCell from "./MemoryCell";
 import MemoryView from "./MemoryView";
 import { useForm, useModal } from "@hooks";
 import AssemblyParser from "./AssemblyParser";
+
 import {
   isMemoryAddress,
   isNumericValue,
@@ -14,6 +15,7 @@ import {
   parseAddr,
   parseSingleLine,
 } from "@utils";
+
 import Console from "./Console";
 
 interface ExamineMemory {
