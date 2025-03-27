@@ -33,41 +33,37 @@ const initialRegisters: CacheMemory = {
 const gpRegisters = ["rax", "rbx", "rcx", "rdx", "rsi", "rdi", "rbp", "rsp"];
 const adgpRegisters = ["r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15"];
 
-interface RegisterContextType {
+interface MemoryContextType {
   registers: CacheMemory;
   setRegister: (key: string, value: number | null) => void;
   gpRegisters: string[];
   adgpRegisters: string[];
 }
 
-const RegisterContext = createContext<RegisterContextType | undefined>(
-  undefined
-);
+const MemoryContext = createContext<MemoryContextType | undefined>(undefined);
 
-export const RegisterProvider = ({ children }: { children: ReactNode }) => {
+export const MemoryProvider = ({ children }: { children: ReactNode }) => {
   const [registers, setRegisters] = useState<CacheMemory>(initialRegisters);
 
   const setRegister = (key: string, value: number | null) => {
-    setRegisters((prev) => ({
-      ...prev,
-      [key]: { ...prev[key], data: value },
-    }));
+    // setRegisters((prev) => ({
+    //   ...prev,
+    //   [key]: { ...prev[key], data: value },
+    // }));
   };
   return (
-    <RegisterContext.Provider
+    <MemoryContext.Provider
       value={{ registers, setRegister, gpRegisters, adgpRegisters }}
     >
       {children}
-    </RegisterContext.Provider>
+    </MemoryContext.Provider>
   );
 };
 
-export const useRegisterContext = () => {
-  const context = useContext(RegisterContext);
+export const useMemoryContext = () => {
+  const context = useContext(MemoryContext);
   if (!context) {
-    throw new Error(
-      "useRegisterContext must be used within a RegisterProvider"
-    );
+    throw new Error("useMemoryContext must be used within a MemoryProvider");
   }
   return context;
 };

@@ -1,5 +1,4 @@
 import { useState, useEffect, SetStateAction } from "react";
-import { ToastContainer } from "react-toastify";
 
 import { Button, Input, Loader, Modal } from "@components";
 
@@ -425,7 +424,6 @@ const Canvas = () => {
 
   return (
     <div className="w-full h-screen bg-[#2d3436] px-4">
-      <ToastContainer />
       {modalStatus.instructionModal && (
         <Modal
           title="Instructions"
