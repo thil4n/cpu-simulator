@@ -24,10 +24,10 @@ export const MemoryProvider = ({ children }: { children: ReactNode }) => {
     setLogs((prevLogs) => [...prevLogs, { type: "error", message }]);
   };
 
-  const value = { logs, info, error };
-
   return (
-    <LoggerContext.Provider value={value}>{children}</LoggerContext.Provider>
+    <LoggerContext.Provider value={{ logs, info, error }}>
+      {children}
+    </LoggerContext.Provider>
   );
 };
 

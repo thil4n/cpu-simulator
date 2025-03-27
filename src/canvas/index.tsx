@@ -16,6 +16,7 @@ import {
 } from "@utils";
 
 import Console from "./Console";
+import { useLoggerContext } from "src/context/LoggerContext";
 
 interface ExamineMemory {
   startAddress: number;
@@ -43,15 +44,7 @@ const Canvas = () => {
   const [memory, memset] = useState<Record<number, number>>({});
   const [memoryRange, setMemRange] = useState([]);
 
-  const [logs, setLogs] = useState([]);
-
-  const consoleLog = (message) => {
-    setLogs((prevLogs) => [...prevLogs, { type: "log", message }]);
-  };
-
-  const consoleError = (message) => {
-    setLogs((prevLogs) => [...prevLogs, { type: "error", message }]);
-  };
+  const logs = useLoggerContext();
 
   interface Register {
     key: string;
