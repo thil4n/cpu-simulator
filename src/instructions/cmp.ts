@@ -51,3 +51,5 @@ const cmp = (src: any, dest: any) => {
     // Set flags based on the result of the comparison
     setFlags(result);
 };
+
+export default cmp;

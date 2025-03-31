@@ -42,3 +42,5 @@ const mov = (op_1: any, op_2: any) => {
         logger.error("Invalid operands given for the mov operation.");
     }
 };
+
+export default mov;

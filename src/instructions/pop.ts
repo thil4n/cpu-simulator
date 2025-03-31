@@ -15,3 +15,5 @@ const pop = (operand: any) => {
         logger.error("Invalid operand given for the pop operation.");
     }
 };
+
+export default pop;

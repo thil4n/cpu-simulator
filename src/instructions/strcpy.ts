@@ -11,3 +11,5 @@ const strcpy = (dest: number, str: string) => {
     memset(memoryValuesCopy);
     console.log(memoryValuesCopy);
 };
+
+export default strcpy;

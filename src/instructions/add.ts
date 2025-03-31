@@ -48,3 +48,5 @@ const add = (src: any, dest: any) => {
         logger.error("Invalid operands given for the ADD operation.");
     }
 };
+
+export default add;

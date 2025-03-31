@@ -7,13 +7,7 @@ import MemoryView from "./MemoryView";
 import { useForm, useModal } from "@hooks";
 import AssemblyParser from "./AssemblyParser";
 
-import {
-    isMemoryAddress,
-    isNumericValue,
-    isRegister,
-    parseAddr,
-    parseSingleLine,
-} from "@utils";
+import { parseSingleLine } from "@utils";
 
 import Console from "./Console";
 import { useLoggerContext, useMemoryContext } from "@context";

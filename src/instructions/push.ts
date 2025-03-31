@@ -17,3 +17,5 @@ const push = (operand: any) => {
         logger.error("Invalid operand given for the push operation.");
     }
 };
+
+export default push;

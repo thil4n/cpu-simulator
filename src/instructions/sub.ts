@@ -48,3 +48,5 @@ const sub = (src: any, dest: any) => {
         logger.error("Invalid operands given for the SUB operation.");
     }
 };
+
+export default sub;
