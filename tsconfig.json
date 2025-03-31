@@ -12,7 +12,8 @@
             "@interfaces": ["src/interfaces/"],
             "@hooks": ["src/hooks/"],
             "@config": ["src/config/"],
-            "@assets": ["src/assets/"]
+            "@assets": ["src/assets/"],
+            "@context": ["src/context/"]
         },
 
         /* Bundler mode */

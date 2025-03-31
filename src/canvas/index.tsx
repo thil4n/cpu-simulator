@@ -1,13 +1,12 @@
 import { useState, useEffect, SetStateAction } from "react";
-import { ToastContainer } from "react-toastify";
-import { toast } from "react-toastify";
 
-import { Button, Input, Modal } from "@components";
+import { Button, Input, Loader, Modal } from "@components";
 
 import MemoryCell from "./MemoryCell";
 import MemoryView from "./MemoryView";
 import { useForm, useModal } from "@hooks";
 import AssemblyParser from "./AssemblyParser";
+
 import {
   isMemoryAddress,
   isNumericValue,
@@ -15,6 +14,9 @@ import {
   parseAddr,
   parseSingleLine,
 } from "@utils";
+
+import Console from "./Console";
+import { useLoggerContext, useMemoryContext } from "@context";
 
 interface ExamineMemory {
   startAddress: number;
@@ -42,44 +44,9 @@ const Canvas = () => {
   const [memory, memset] = useState<Record<number, number>>({});
   const [memoryRange, setMemRange] = useState([]);
 
-  interface Register {
-    key: string;
-    data: number | null;
-    desc: string;
-  }
+  const logger = useLoggerContext();
 
-  interface CacheMem {
-    [key: string]: Register;
-  }
-
-  const registers: CacheMem = {
-    rax: { key: "rax", data: null, desc: "Accumulator Register" },
-    rbx: { key: "rbx", data: null, desc: "Base Register" },
-    rcx: { key: "rcx", data: null, desc: "Counter Register" },
-    rdx: { key: "rdx", data: null, desc: "Data Register" },
-
-    rsi: { key: "rsi", data: null, desc: "Source Index Register" },
-    rdi: { key: "rdi", data: null, desc: "Destination Index Register" },
-
-    rbp: { key: "rbp", data: 10000, desc: "Base Pointer Register" },
-    rsp: { key: "rsp", data: 10100, desc: "Stack Pointer Register" },
-
-    r8: { key: "r8", data: null, desc: "R8 Register" },
-    r9: { key: "r9", data: null, desc: "R9 Register" },
-    r10: { key: "r10", data: null, desc: "R10 Register" },
-    r11: { key: "r11", data: null, desc: "R11 Register" },
-    r12: { key: "r12", data: null, desc: "R12 Register" },
-    r13: { key: "r13", data: null, desc: "R13 Register" },
-    r14: { key: "r14", data: null, desc: "R14 Register" },
-    r15: { key: "r15", data: null, desc: "R15 Register" },
-
-    rip: { key: "rip", data: null, desc: "Instruction Pointer Register" },
-
-    rflags: { key: "rflags", data: null, desc: "R Flags Register" },
-  };
-
-  const gp_registers = ["rax", "rbx", "rcx", "rdx", "rsi", "rdi", "rbp", "rsp"];
-  const adgp_registers = ["r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15"];
+  const { registers, regset } = useMemoryContext();
 
   const showMemory = (startAddr: number, highlightLength = 0) => {
     const endAddr = startAddr + 200;
@@ -96,10 +63,6 @@ const Canvas = () => {
   const handleClickRegister = (register: SetStateAction<null>) => {
     setSelectedRegister(register);
   };
-
-  const handleMove = (src: any, dest: any) => {};
-
-  const accessMemory = (src: any, dest: any) => {};
 
   const intcpy = (dest: number, value: number) => {
     const memoryValuesCopy = { ...memory };
@@ -135,68 +98,249 @@ const Canvas = () => {
 
   const push = (operand: any) => {
     if (isRegister(operand)) {
-      intcpy(registers.rsp.data, registers[operand].data);
-      toast.info("operand  is a register");
+      intcpy(registers.rsp, registers[operand]);
+      logger.info(`Pushing the value of ${operand} register onto the stack.`);
     } else if (isMemoryAddress(operand)) {
-      toast.info("operand  is a memory address");
+      logger.info(
+        `Pushing the value from the address ${operand}  onto the stack.`
+      );
     } else if (isNumericValue(operand)) {
-      toast.info("operand  is a value");
-      intcpy(registers.rsp.data, parseInt(operand));
+      intcpy(registers.rsp, parseInt(operand));
+      logger.info(`Pushing the value : ${operand}  onto the stack.`);
     } else {
-      toast.info("Invalid operand");
+      logger.error("Invalid operand given for the push operation.");
+    }
+  };
+
+  const pop = (operand: any) => {
+    if (isRegister(operand)) {
+      //intcpy(registers.rsp, registers[operand]);
+      logger.info(
+        `Copying the value of top of the stack to the ${operand} register.`
+      );
+    } else if (isMemoryAddress(operand)) {
+      logger.info(
+        `Copying the value of top of the stack to the address ${operand}.`
+      );
+    } else {
+      logger.error("Invalid operand given for the pop operation.");
     }
   };
 
   const mov = (op_1: any, op_2: any) => {
     // op_1 | op_2 : reg
     if (isRegister(op_1) && isRegister(op_2)) {
-      registers[op_2].data = registers[op_1].data;
+      registers[op_2] = registers[op_1];
+      logger.info(`Moving the value ${op_1} into ${parseAddr(op_2)}.`);
     }
 
     // op_1 : reg | op_2 : mem addr
     else if (isRegister(op_1) && isMemoryAddress(op_2)) {
-      intcpy(op_2, registers[op_1].data);
+      intcpy(op_2, registers[op_1]);
+      logger.info(`Moving the value ${op_1} into ${parseAddr(op_2)}.`);
     }
 
     // op_1 : mem |  op_2 : reg
     else if (isMemoryAddress(op_1) && isRegister(op_2)) {
-      intcpy(registers[op_2].data, op_1);
+      intcpy(registers[op_2], op_1);
+      logger.info(`Moving the value ${op_1} into ${parseAddr(op_2)}.`);
     }
 
     // op_1 | op_2 : mem addr
     else if (isMemoryAddress(op_1) && isMemoryAddress(op_2)) {
       intcpy(op_2, op_1);
+      logger.info(`Moving the value ${op_1} into ${parseAddr(op_2)}.`);
     }
 
     // op_1 : num value | op_2 : reg
     else if (isNumericValue(op_1) && isRegister(op_2)) {
-      intcpy(registers[op_1].data, parseInt(op_1));
+      intcpy(registers[op_1], parseInt(op_1));
+      logger.info(`Moving the value ${op_1} into ${parseAddr(op_2)}.`);
     }
 
     // op_1 : num value | op_2 : mem addr
     else if (isNumericValue(op_1) && isMemoryAddress(op_2)) {
       intcpy(parseAddr(op_2), parseInt(op_1));
-      console.info(`Moving the value ${op_1} into ${parseAddr(op_2)}.`);
+      logger.info(`Moving the value ${op_1} into ${parseAddr(op_2)}.`);
     }
 
     // Invalid operation
     else {
-      toast.info(" Invalid operands");
+      logger.error("Invalid operands given for the mov operation.");
     }
   };
 
-  const pop = (dest: any) => {};
-  const add = (src: any, dest: any) => {};
-  const sub = (src: any, dest: any) => {};
-  const cmp = (src: any, dest: any) => {};
+  const add = (src: any, dest: any) => {
+    // src & dest : reg
+    if (isRegister(src) && isRegister(dest)) {
+      registers[dest] += registers[src];
+      logger.info(`ADD ${src} -> ${dest} (Register to Register)`);
+    }
+
+    // src : reg | dest : mem addr
+    else if (isRegister(src) && isMemoryAddress(dest)) {
+      let result = registers[src] + intcpy(parseAddr(dest));
+      intcpy(parseAddr(dest), result);
+      logger.info(`ADD ${src} -> ${parseAddr(dest)} (Register to Memory)`);
+    }
+
+    // src : mem | dest : reg
+    else if (isMemoryAddress(src) && isRegister(dest)) {
+      registers[dest] += intcpy(parseAddr(src));
+      logger.info(`ADD ${parseAddr(src)} -> ${dest} (Memory to Register)`);
+    }
+
+    // src & dest : mem addr
+    else if (isMemoryAddress(src) && isMemoryAddress(dest)) {
+      let result = intcpy(parseAddr(src)) + intcpy(parseAddr(dest));
+      intcpy(parseAddr(dest), result);
+      logger.info(
+        `ADD ${parseAddr(src)} -> ${parseAddr(dest)} (Memory to Memory)`
+      );
+    }
+
+    // src : num value | dest : reg
+    else if (isNumericValue(src) && isRegister(dest)) {
+      registers[dest] += parseInt(src);
+      logger.info(`ADD ${src} -> ${dest} (Immediate to Register)`);
+    }
+
+    // src : num value | dest : mem addr
+    else if (isNumericValue(src) && isMemoryAddress(dest)) {
+      let result = parseInt(src) + intcpy(parseAddr(dest));
+      intcpy(parseAddr(dest), result);
+      logger.info(`ADD ${src} -> ${parseAddr(dest)} (Immediate to Memory)`);
+    }
+
+    // Invalid operation
+    else {
+      logger.error("Invalid operands given for the ADD operation.");
+    }
+  };
+
+  const sub = (src: any, dest: any) => {
+    // src & dest : reg
+    if (isRegister(src) && isRegister(dest)) {
+      registers[dest] -= registers[src];
+      logger.info(`SUB ${src} -> ${dest} (Register to Register)`);
+    }
+
+    // src : reg | dest : mem addr
+    else if (isRegister(src) && isMemoryAddress(dest)) {
+      let result = intcpy(parseAddr(dest)) - registers[src];
+      intcpy(parseAddr(dest), result);
+      logger.info(`SUB ${src} -> ${parseAddr(dest)} (Register from Memory)`);
+    }
+
+    // src : mem | dest : reg
+    else if (isMemoryAddress(src) && isRegister(dest)) {
+      registers[dest] -= intcpy(parseAddr(src));
+      logger.info(`SUB ${parseAddr(src)} -> ${dest} (Memory to Register)`);
+    }
+
+    // src & dest : mem addr
+    else if (isMemoryAddress(src) && isMemoryAddress(dest)) {
+      let result = intcpy(parseAddr(dest)) - intcpy(parseAddr(src));
+      intcpy(parseAddr(dest), result);
+      logger.info(
+        `SUB ${parseAddr(src)} -> ${parseAddr(dest)} (Memory to Memory)`
+      );
+    }
+
+    // src : num value | dest : reg
+    else if (isNumericValue(src) && isRegister(dest)) {
+      registers[dest] -= parseInt(src);
+      logger.info(`SUB ${src} -> ${dest} (Immediate to Register)`);
+    }
+
+    // src : num value | dest : mem addr
+    else if (isNumericValue(src) && isMemoryAddress(dest)) {
+      let result = intcpy(parseAddr(dest)) - parseInt(src);
+      intcpy(parseAddr(dest), result);
+      logger.info(`SUB ${src} -> ${parseAddr(dest)} (Immediate to Memory)`);
+    }
+
+    // Invalid operation
+    else {
+      logger.error("Invalid operands given for the SUB operation.");
+    }
+  };
+
+  const cmp = (src: any, dest: any) => {
+    let result;
+
+    // src & dest : reg
+    if (isRegister(src) && isRegister(dest)) {
+      result = registers[dest] - registers[src];
+      logger.info(`CMP ${src} -> ${dest} (Register to Register)`);
+    }
+
+    // src : reg | dest : mem addr
+    else if (isRegister(src) && isMemoryAddress(dest)) {
+      result = intcpy(parseAddr(dest)) - registers[src];
+      logger.info(`CMP ${src} -> ${parseAddr(dest)} (Register to Memory)`);
+    }
+
+    // src : mem | dest : reg
+    else if (isMemoryAddress(src) && isRegister(dest)) {
+      result = registers[dest] - intcpy(parseAddr(src));
+      logger.info(`CMP ${parseAddr(src)} -> ${dest} (Memory to Register)`);
+    }
+
+    // src & dest : mem addr
+    else if (isMemoryAddress(src) && isMemoryAddress(dest)) {
+      result = intcpy(parseAddr(dest)) - intcpy(parseAddr(src));
+      logger.info(
+        `CMP ${parseAddr(src)} -> ${parseAddr(dest)} (Memory to Memory)`
+      );
+    }
+
+    // src : num value | dest : reg
+    else if (isNumericValue(src) && isRegister(dest)) {
+      result = registers[dest] - parseInt(src);
+      logger.info(`CMP ${src} -> ${dest} (Immediate to Register)`);
+    }
+
+    // src : num value | dest : mem addr
+    else if (isNumericValue(src) && isMemoryAddress(dest)) {
+      result = intcpy(parseAddr(dest)) - parseInt(src);
+      logger.info(`CMP ${src} -> ${parseAddr(dest)} (Immediate to Memory)`);
+    }
+
+    // Invalid operation
+    else {
+      logger.error("Invalid operands given for the CMP operation.");
+      return;
+    }
+
+    // Set flags based on the result of the comparison
+    setFlags(result);
+  };
+
+  const setFlags = (result: number) => {
+    // Zero flag: Set if the result is zero
+    const zeroFlag = result === 0;
+
+    // Negative flag: Set if the result is negative
+    const negativeFlag = result < 0;
+
+    // Carry flag: Set if no borrow occurred (unsigned comparison)
+    const carryFlag = result >= 0;
+
+    logger.info(
+      `Flags - Zero: ${zeroFlag}, Negative: ${negativeFlag}, Carry: ${carryFlag}`
+    );
+  };
 
   const parseAssembly = () => {
     const instruction = formData.assemblyInput;
 
     const { operation, operandOne, operandTwo } = parseSingleLine(instruction);
 
-    console.info(
-      `Operation : ${operation} |  Operand One : ${operandOne} | Operand Two : ${operandTwo}`
+    logger.info(
+      `Parsing the instruction ${operation} with operand one is ${operandOne} ${
+        operandTwo ? " and operand two is " + operandTwo : "."
+      }`
     );
 
     switch (operation) {
@@ -204,15 +348,18 @@ const Canvas = () => {
         const src = operandTwo;
         const dest = operandOne;
         mov(src, dest);
-
         break;
 
       case "push":
         push(operandOne);
+        break;
 
+      case "pop":
+        pop(operandOne);
         break;
 
       default:
+        logger.error("Invalid operation given.");
         break;
     }
   };
@@ -225,9 +372,10 @@ const Canvas = () => {
     parseAssembly();
   };
 
+  const [loadingState, setLoadingState] = useState(false);
+
   return (
     <div className="w-full h-screen bg-[#2d3436] px-4">
-      <ToastContainer />
       {modalStatus.instructionModal && (
         <Modal
           title="Instructions"
@@ -283,58 +431,65 @@ const Canvas = () => {
             );
           })}
         </div>
-        <div className="w-full col-span-5 mt-5">
-          <h1 className="bg-primary text-secondary w-full py-2 text-center uppercase">
-            ASSEMBLY INSTRUCTIONS
-          </h1>
-          <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg px-6 py-4">
-            {instructions.map((line: any) => {
-              return (
-                <div className="flex py-1 px-2 border-b border-secondary hover:bg-primary text-slate-400 hover:text-secondary  cursor-pointer">
-                  <div className="w-32">{line.operation}</div>
-                  <div className="w-[300px]">{line.operandOne}</div>
-                  <div className="">{line.operandTwo}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        <div className="w-full col-span-2 mt-5">
-          <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg">
-            <h1 className="bg-primary text-secondary w-full py-2 text-center uppercase mb-3">
-              CONTROL EXECUTION
-            </h1>
-            <div className="px-2">
-              <Button
-                text="LOAD PROGRAM"
-                handleClick={() => {
-                  openModal("instructionModal");
-                }}
-              />
-              <Button text="BREAKPOINTS" handleClick={() => {}} />
-              <div className="grid grid-cols-2 gap-2">
-                <Button text="BACK" handleClick={parseAssembly} />
-                <Button text="NEXT" handleClick={parseAssembly} />
+        <div className="relative min-h-screen flex flex-col col-span-7 w-full">
+          <div className="grid grid-cols-7 gap-2">
+            <div className="w-full col-span-5 mt-5">
+              <h1 className="bg-primary text-secondary w-full py-1 text-md text-center uppercase">
+                ASSEMBLY INSTRUCTIONS
+              </h1>
+              <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg px-6 py-4">
+                {instructions.map((line: any) => {
+                  return (
+                    <div className="flex py-1 px-2 border-b border-secondary hover:bg-primary text-slate-400 hover:text-secondary  cursor-pointer">
+                      <div className="w-32">{line.operation}</div>
+                      <div className="w-[300px]">{line.operandOne}</div>
+                      <div className="">{line.operandTwo}</div>
+                    </div>
+                  );
+                })}
               </div>
-              <Input
-                name="assemblyInput"
-                inputClassName="placeholder-gray-500"
-                placeholder="Assembly instruction"
-                value={formData.assemblyInput}
-                handleChange={handleChange}
-              />
-              <Button
-                className="-mt-1"
-                text="EXECUTE"
-                handleClick={parseAssembly}
-              />
             </div>
+            <div className="w-full col-span-2 mt-5">
+              <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg">
+                <h1 className="bg-primary text-secondary w-full py-1 text-md text-center uppercase mb-3">
+                  CONTROL EXECUTION
+                </h1>
+                <div className="px-2">
+                  <Button
+                    text="LOAD PROGRAM"
+                    handleClick={() => {
+                      openModal("instructionModal");
+                    }}
+                  />
+                  <Button text="BREAKPOINTS" handleClick={() => {}} />
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button text="BACK" handleClick={parseAssembly} />
+                    <Button text="NEXT" handleClick={parseAssembly} />
+                  </div>
+                  <Input
+                    name="assemblyInput"
+                    inputClassName="placeholder-gray-500"
+                    placeholder="Assembly instruction"
+                    value={formData.assemblyInput}
+                    handleChange={handleChange}
+                  />
+                  <Button
+                    className="-mt-1"
+                    text="EXECUTE"
+                    handleClick={parseAssembly}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="absolute bottom-1 w-full">
+            <Console logs={logger.logs} />
           </div>
         </div>
 
         <div className="w-full col-span-3">
           <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg mb-5 mt-5">
-            <h1 className="bg-primary  text-secondary w-full py-2 text-center uppercase">
+            <h1 className="bg-primary  text-secondary w-full py-1 text-md text-center uppercase">
               CPU REGISTERS
             </h1>
             <div className="grid grid-cols-3 gap-1 mt-3 px-2">
@@ -367,7 +522,7 @@ const Canvas = () => {
             </div>
           </div>
           <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg">
-            <h1 className="bg-primary text-secondary w-full py-2 text-center uppercase">
+            <h1 className="bg-primary text-secondary w-full py-1 text-md text-center uppercase">
               Examine Memory
             </h1>
             <div className="px-2 py2 mt-3">
@@ -375,8 +530,8 @@ const Canvas = () => {
                 <Button
                   text={"Stack"}
                   handleClick={() => {
-                    const rbp = registers.rbp.data;
-                    const rsp = registers.rsp.data;
+                    const rbp = registers.rbp;
+                    const rsp = registers.rsp;
                     const stackLength = rsp - rbp;
                     showMemory(rbp, stackLength);
                   }}
@@ -416,14 +571,14 @@ const Canvas = () => {
                 <Button
                   text={"Examine"}
                   handleClick={() => {
-                    const value = parseInt(inputs.addrInput.data);
+                    const value = parseInt(inputs.addrInput);
                     showMemory(value);
                   }}
                 />
                 <Button
                   text={"Clear"}
                   handleClick={() => {
-                    const value = parseInt(inputs.addrInput.data);
+                    const value = parseInt(inputs.addrInput);
                     showMemory(value);
                   }}
                 />
@@ -433,9 +588,14 @@ const Canvas = () => {
         </div>
       </div>
 
-      {/* {loadingState && (
-                <Loader handleClose={() => setLoadingState(false)} />
-            )} */}
+      {loadingState && (
+        <Loader
+          handleClose={() => {
+            logger.info("Initialization completed.");
+            setLoadingState(false);
+          }}
+        />
+      )}
     </div>
   );
 };
