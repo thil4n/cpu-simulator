@@ -1,15 +1,16 @@
-import { useState, useEffect, SetStateAction } from "react";
+import { useState, useEffect } from "react";
 
 import { Button, Input, Loader, Modal } from "@components";
 
+import { useForm, useModal } from "@hooks";
+
+import AssemblyParser from "./AssemblyParser";
+import Console from "./Console";
 import MemoryCell from "./MemoryCell";
 import MemoryView from "./MemoryView";
-import { useForm, useModal } from "@hooks";
-import AssemblyParser from "./AssemblyParser";
 
 import { parseSingleLine } from "@utils";
 
-import Console from "./Console";
 import { useLoggerContext, useMemoryContext } from "@context";
 import useInstructions from "src/instructions/useInstructions";
 
@@ -36,12 +37,12 @@ const Canvas = () => {
         addrInput: "",
     });
 
-    const [memory, memset] = useState<Record<number, number>>({});
     const [memoryRange, setMemRange] = useState([]);
 
     const logger = useLoggerContext();
 
-    const { registers, regset } = useMemoryContext();
+    const { registers, regset, memory, memset, adgpRegisters, gpRegisters } =
+        useMemoryContext();
     const { pop, push, mov } = useInstructions();
 
     const showMemory = (startAddr: number, highlightLength = 0) => {
@@ -56,23 +57,8 @@ const Canvas = () => {
         setMemRange(memRange);
     };
 
-    const handleClickRegister = (register: SetStateAction<null>) => {
+    const handleClickRegister = (register) => {
         setSelectedRegister(register);
-    };
-
-    const setFlags = (result: number) => {
-        // Zero flag: Set if the result is zero
-        const zeroFlag = result === 0;
-
-        // Negative flag: Set if the result is negative
-        const negativeFlag = result < 0;
-
-        // Carry flag: Set if no borrow occurred (unsigned comparison)
-        const carryFlag = result >= 0;
-
-        logger.info(
-            `Flags - Zero: ${zeroFlag}, Negative: ${negativeFlag}, Carry: ${carryFlag}`
-        );
     };
 
     const parseAssembly = () => {
@@ -128,7 +114,6 @@ const Canvas = () => {
                     }}
                 >
                     <AssemblyParser
-                        selectedDataItem={undefined}
                         setInstructions={(cpuInstructions) => {
                             setInstructions(cpuInstructions);
                             closeModal("instructionModal");
@@ -253,23 +238,27 @@ const Canvas = () => {
                         </h1>
                         <div className="grid grid-cols-3 gap-1 mt-3 px-2">
                             <div>
-                                {gp_registers.map((register) => {
+                                {gpRegisters.map((register) => {
                                     return (
                                         <Button
                                             key={register}
                                             text={register}
-                                            handleClick={handleClickRegister}
+                                            handleClick={() => {
+                                                handleClickRegister(register);
+                                            }}
                                         />
                                     );
                                 })}
                             </div>
                             <div>
-                                {adgp_registers.map((register) => {
+                                {adgpRegisters.map((register) => {
                                     return (
                                         <Button
                                             key={register}
                                             text={register}
-                                            handleClick={handleClickRegister}
+                                            handleClick={() => {
+                                                handleClickRegister(register);
+                                            }}
                                         />
                                     );
                                 })}
@@ -277,11 +266,15 @@ const Canvas = () => {
                             <div>
                                 <Button
                                     text={"RIP"}
-                                    handleClick={handleClickRegister}
+                                    handleClick={() => {
+                                        handleClickRegister("rip");
+                                    }}
                                 />
                                 <Button
-                                    text={"RFLGAS"}
-                                    handleClick={handleClickRegister}
+                                    text={"RFLAGS"}
+                                    handleClick={() => {
+                                        handleClickRegister("rflags");
+                                    }}
                                 />
                             </div>
                         </div>
@@ -346,19 +339,15 @@ const Canvas = () => {
                                 <Button
                                     text={"Examine"}
                                     handleClick={() => {
-                                        const value = parseInt(
-                                            inputs.addrInput
-                                        );
-                                        showMemory(value);
+                                        // const value = parseInt(3);
+                                        // showMemory(value);
                                     }}
                                 />
                                 <Button
                                     text={"Clear"}
                                     handleClick={() => {
-                                        const value = parseInt(
-                                            inputs.addrInput
-                                        );
-                                        showMemory(value);
+                                        // const value = parseInt(3);
+                                        // showMemory(value);
                                     }}
                                 />
                             </div>

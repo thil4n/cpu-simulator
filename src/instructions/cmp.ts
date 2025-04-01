@@ -1,6 +1,21 @@
 import { isMemoryAddress, isNumericValue, isRegister, parseAddr } from "@utils";
 import intcpy from "./intcpy";
 
+const setFlags = (result: number) => {
+    // Zero flag: Set if the result is zero
+    const zeroFlag = result === 0;
+
+    // Negative flag: Set if the result is negative
+    const negativeFlag = result < 0;
+
+    // Carry flag: Set if no borrow occurred (unsigned comparison)
+    const carryFlag = result >= 0;
+
+    logger.info(
+        `Flags - Zero: ${zeroFlag}, Negative: ${negativeFlag}, Carry: ${carryFlag}`
+    );
+};
+
 const cmp = (src: any, dest: any) => {
     let result;
 
