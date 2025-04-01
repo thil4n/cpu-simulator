@@ -1,7 +1,10 @@
-import { useMemoryContext } from "@context";
+import { useLoggerContext, useMemoryContext } from "@context";
+import { isRegister, isMemoryAddress, isNumericValue } from "@utils";
+import intcpy from "./intcpy";
 
 const push = (operand: any) => {
-    const { memory, memset } = useMemoryContext();
+    const { registers } = useMemoryContext();
+    const logger = useLoggerContext();
 
     if (isRegister(operand)) {
         intcpy(registers.rsp, registers[operand]);

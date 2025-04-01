@@ -11,6 +11,7 @@ import { parseSingleLine } from "@utils";
 
 import Console from "./Console";
 import { useLoggerContext, useMemoryContext } from "@context";
+import useInstructions from "src/instructions/useInstructions";
 
 interface ExamineMemory {
     startAddress: number;
@@ -41,6 +42,7 @@ const Canvas = () => {
     const logger = useLoggerContext();
 
     const { registers, regset } = useMemoryContext();
+    const { pop, push, mov } = useInstructions();
 
     const showMemory = (startAddr: number, highlightLength = 0) => {
         const endAddr = startAddr + 200;
