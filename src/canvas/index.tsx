@@ -12,7 +12,7 @@ import MemoryView from "./MemoryView";
 import { parseSingleLine } from "@utils";
 
 import { useLoggerContext, useMemoryContext } from "@context";
-import useInstructions from "src/instructions/useInstructions";
+import useInstructions from "../instructions/useInstructions";
 
 interface ExamineMemory {
     startAddress: number;
@@ -161,79 +161,71 @@ const Canvas = () => {
                     })}
                 </div>
                 <div className="relative min-h-screen flex flex-col col-span-7 w-full">
-                    <div className="grid grid-cols-7 gap-2">
-                        <div className="w-full col-span-5 mt-5">
-                            <h1 className="bg-primary text-secondary w-full py-1 text-md text-center uppercase">
-                                ASSEMBLY INSTRUCTIONS
-                            </h1>
-                            <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg px-6 py-4">
-                                {instructions.map((line: any) => {
-                                    return (
-                                        <div className="flex py-1 px-2 border-b border-secondary hover:bg-primary text-slate-400 hover:text-secondary  cursor-pointer">
-                                            <div className="w-32">
-                                                {line.operation}
-                                            </div>
-                                            <div className="w-[300px]">
-                                                {line.operandOne}
-                                            </div>
-                                            <div className="">
-                                                {line.operandTwo}
-                                            </div>
+                    <div className="w-full col-span-5 mt-5">
+                        <h1 className="bg-primary text-secondary w-full py-1 text-sm text-center uppercase">
+                            ASSEMBLY INSTRUCTIONS
+                        </h1>
+                        <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg px-6 py-4">
+                            {instructions.map((line: any) => {
+                                return (
+                                    <div className="flex py-1 px-2 border-b border-secondary hover:bg-primary text-slate-400 hover:text-secondary  cursor-pointer">
+                                        <div className="w-32">
+                                            {line.operation}
                                         </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                        <div className="w-full col-span-2 mt-5">
-                            <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg">
-                                <h1 className="bg-primary text-secondary w-full py-1 text-md text-center uppercase mb-3">
-                                    CONTROL EXECUTION
-                                </h1>
-                                <div className="px-2">
-                                    <Button
-                                        text="LOAD PROGRAM"
-                                        handleClick={() => {
-                                            openModal("instructionModal");
-                                        }}
-                                    />
-                                    <Button
-                                        text="BREAKPOINTS"
-                                        handleClick={() => {}}
-                                    />
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <Button
-                                            text="BACK"
-                                            handleClick={parseAssembly}
-                                        />
-                                        <Button
-                                            text="NEXT"
-                                            handleClick={parseAssembly}
-                                        />
+                                        <div className="w-[300px]">
+                                            {line.operandOne}
+                                        </div>
+                                        <div className="">
+                                            {line.operandTwo}
+                                        </div>
                                     </div>
-                                    <Input
-                                        name="assemblyInput"
-                                        inputClassName="placeholder-gray-500"
-                                        placeholder="Assembly instruction"
-                                        value={formData.assemblyInput}
-                                        handleChange={handleChange}
-                                    />
-                                    <Button
-                                        className="-mt-1"
-                                        text="EXECUTE"
-                                        handleClick={parseAssembly}
-                                    />
-                                </div>
-                            </div>
+                                );
+                            })}
                         </div>
                     </div>
+
                     <div className="absolute bottom-1 w-full">
                         <Console logs={logger.logs} />
                     </div>
                 </div>
 
                 <div className="w-full col-span-3">
-                    <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg mb-5 mt-5">
-                        <h1 className="bg-primary  text-secondary w-full py-1 text-md text-center uppercase">
+                    <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg">
+                        <h1 className="bg-primary text-secondary w-full py-1 text-sm text-center uppercase mb-3">
+                            CONTROL EXECUTION
+                        </h1>
+                        <div className="px-2">
+                            <Button
+                                text="LOAD PROGRAM"
+                                handleClick={() => {
+                                    openModal("instructionModal");
+                                }}
+                            />
+                            <div className="grid grid-cols-3 gap-1">
+                                <Button
+                                    text="BACK"
+                                    handleClick={parseAssembly}
+                                />
+                                <Button
+                                    text="EXECUTE"
+                                    handleClick={parseAssembly}
+                                />
+                                <Button
+                                    text="NEXT"
+                                    handleClick={parseAssembly}
+                                />
+                            </div>
+                            <Input
+                                name="assemblyInput"
+                                inputClassName="placeholder-gray-500"
+                                placeholder="Assembly instruction"
+                                value={formData.assemblyInput}
+                                handleChange={handleChange}
+                            />
+                        </div>
+                    </div>
+                    <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg mb-2 mt-2">
+                        <h1 className="bg-primary  text-secondary w-full py-1 text-sm text-center uppercase">
                             CPU REGISTERS
                         </h1>
                         <div className="grid grid-cols-3 gap-1 mt-3 px-2">
@@ -280,7 +272,7 @@ const Canvas = () => {
                         </div>
                     </div>
                     <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg">
-                        <h1 className="bg-primary text-secondary w-full py-1 text-md text-center uppercase">
+                        <h1 className="bg-primary text-secondary w-full py-1 text-sm text-center uppercase">
                             Examine Memory
                         </h1>
                         <div className="px-2 py2 mt-3">
@@ -332,22 +324,6 @@ const Canvas = () => {
                                         throw new Error(
                                             "Function not implemented."
                                         );
-                                    }}
-                                />
-                            </div>
-                            <div className="  grid grid-cols-2 gap-2">
-                                <Button
-                                    text={"Examine"}
-                                    handleClick={() => {
-                                        // const value = parseInt(3);
-                                        // showMemory(value);
-                                    }}
-                                />
-                                <Button
-                                    text={"Clear"}
-                                    handleClick={() => {
-                                        // const value = parseInt(3);
-                                        // showMemory(value);
                                     }}
                                 />
                             </div>
