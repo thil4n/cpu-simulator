@@ -1,8 +1,12 @@
 import { useLoggerContext, useMemoryContext } from "@context";
 import { isRegister, isMemoryAddress, isNumericValue } from "@utils";
-import intcpy from "./intcpy";
+import useInstructions from "./useInstructions";
 
 const push = (operand: any) => {
+
+    const { intcpy } = useInstructions();
+
+    
     const { registers } = useMemoryContext();
     const logger = useLoggerContext();
 
