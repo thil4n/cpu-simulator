@@ -1,5 +1,5 @@
 import { isMemoryAddress, isNumericValue, isRegister, parseAddr } from "@utils";
-import intcpy from "./intcpy";
+import intcpy from "./useIntcpy";
 
 const setFlags = (result: number) => {
     // Zero flag: Set if the result is zero

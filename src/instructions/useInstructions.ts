@@ -1,14 +1,33 @@
-import intcpy from "./intcpy";
-import strcpy from "./strcpy";
-import mov from "./mov";
-import push from "./push";
-import pop from "./pop";
-import sub from "./sub";
-import add from "./add";
-import cmp from "./cmp";
+import useIntcpy from "./useIntcpy";
+import useMov from "./useMov";
+import usePush from "./usePush";
+import useStrcpy from "./useStrcpy";
 
 const useInstructions = () => {
-    return { intcpy, strcpy, mov, push, pop, add, sub, cmp };
-};
+  const push = usePush();
+  const strcpy = useStrcpy();
+  const intcpy = useIntcpy();
+  const mov = useMov();
 
+  // const add = useAdd();
+  // const pop = usePop();  
+  // const sub = useSub();
+  // const mul = useMul();
+  // const div = useDiv();
+  // const cmp = useCmp();
+  // const jmp = useJmp();
+  // const call = useCall();
+  // const ret = useRet();
+  // const and = useAnd();
+  // const or = useOr();
+  // const xor = useXor();
+  // const not = useNot();
+  // const inc = useInc();
+  // const dec = useDec();
+
+
+
+  
+  return { push,  strcpy, intcpy, mov, /*pop,add, sub, mul, div, cmp, jmp, call, ret, and, or, xor, not, inc, dec */ };
+}
 export default useInstructions;

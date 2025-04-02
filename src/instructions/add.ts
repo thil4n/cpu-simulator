@@ -1,5 +1,5 @@
 import { isMemoryAddress, isRegister, parseAddr } from "@utils";
-import intcpy from "./intcpy";
+import intcpy from "./useIntcpy";
 
 const add = (src: any, dest: any) => {
     // src & dest : reg
