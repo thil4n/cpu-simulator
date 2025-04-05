@@ -1,23 +1,25 @@
 import { useState } from "react";
 
-const useModal = (initModalState) => {
-    const [modalStatus, setModalStatus] = useState(initModalState);
+type ModalState = Record<string, boolean>;
 
-    const toggleModal = (modalId) => {
+const useModal = (initModalState: ModalState = {}) => {
+    const [modalStatus, setModalStatus] = useState<ModalState>(initModalState);
+
+    const toggleModal = (modalId: string) => {
         setModalStatus((prevStatus) => ({
             ...prevStatus,
             [modalId]: !prevStatus[modalId],
         }));
     };
 
-    const closeModal = (modalId) => {
+    const closeModal = (modalId: string) => {
         setModalStatus((prevStatus) => ({
             ...prevStatus,
             [modalId]: false,
         }));
     };
 
-    const openModal = (modalId) => {
+    const openModal = (modalId: string) => {
         setModalStatus((prevStatus) => ({
             ...prevStatus,
             [modalId]: true,

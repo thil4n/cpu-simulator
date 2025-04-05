@@ -1,6 +1,6 @@
 import { Button } from "@components";
 
-const MemoryView = ({ register, handleClose }) => {
+const RegisterView = ({ register, handleClose }) => {
     let value = register.data;
     if (!value) {
         value = Math.floor(Math.random() * 1000) + 1;
@@ -59,4 +59,4 @@ const MemoryView = ({ register, handleClose }) => {
     );
 };
 
-export default MemoryView;
+export default RegisterView;
