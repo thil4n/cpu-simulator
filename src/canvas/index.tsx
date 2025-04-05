@@ -22,7 +22,10 @@ interface ExamineMemory {
 }
 
 const Canvas = () => {
-    const [selectedRegister, setSelectedRegister] = useState(null);
+    const [selectedRegister, setSelectedRegister] = useState<string | null>(
+        null
+    );
+
     const [examineMemory, setExamineMemory] = useState<ExamineMemory | null>(
         null
     );
@@ -127,7 +130,7 @@ const Canvas = () => {
                         closeModal("registerModal");
                         setExamineMemory(null);
                     }}
-                    title={"Examine Register"}
+                    title={`Examine Register - ${selectedRegister.toUpperCase()}`}
                     className="w-[90%] text-secondary"
                 >
                     <RegisterView register={selectedRegister} />
