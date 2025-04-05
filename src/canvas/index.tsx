@@ -46,7 +46,9 @@ const Canvas = () => {
 
     const { registers, regset, memory, memset, adgpRegisters, gpRegisters } =
         useMemoryContext();
-    const { pop, push, mov } = useInstructions();
+    const { push, mov } = useInstructions();
+
+    console.log(mov);
 
     const showMemory = (startAddr: number, highlightLength = 0) => {
         const endAddr = startAddr + 200;
@@ -88,10 +90,6 @@ const Canvas = () => {
                 push(operandOne);
                 break;
 
-            case "pop":
-                pop(operandOne);
-                break;
-
             default:
                 logger.error("Invalid operation given.");
                 break;
@@ -106,7 +104,7 @@ const Canvas = () => {
         parseAssembly();
     };
 
-    const [loadingState, setLoadingState] = useState(true);
+    const [loadingState, setLoadingState] = useState(false);
 
     return (
         <div className="w-full h-screen bg-[#2d3436]">
