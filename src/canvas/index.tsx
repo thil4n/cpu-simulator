@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 
-import { Button, Input, Loader, Modal, NavBar } from "@components";
+import { Button, Input, Loader, Mobile, Modal, NavBar } from "@components";
 
-import { useForm, useModal } from "@hooks";
+import { useForm, useModal, useScreen } from "@hooks";
 
 import AssemblyParser from "./AssemblyParser";
 import Console from "./Console";
@@ -41,6 +41,8 @@ const Canvas = () => {
     const [memoryRange, setMemRange] = useState([]);
 
     const logger = useLoggerContext();
+
+    const isDesktop = useScreen();
 
     const { registers, regset, memory, memset, adgpRegisters, gpRegisters } =
         useMemoryContext();
@@ -104,7 +106,7 @@ const Canvas = () => {
         parseAssembly();
     };
 
-    const [loadingState, setLoadingState] = useState(false);
+    const [loadingState, setLoadingState] = useState(true);
 
     return (
         <div className="w-full h-screen bg-[#2d3436]">
@@ -378,6 +380,8 @@ const Canvas = () => {
                     }}
                 />
             )}
+
+            {!isDesktop && !loadingState && <Mobile />}
         </div>
     );
 };

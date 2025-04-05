@@ -34,6 +34,9 @@ module.exports = {
                 24: "repeat(24, minmax(0, 1fr))",
                 64: "repeat(64, minmax(0, 1fr))",
             },
+            animation: {
+                "cpu-spin": "spin 2s linear infinite",
+            },
         },
     },
     variants: {},
