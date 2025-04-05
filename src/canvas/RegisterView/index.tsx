@@ -7,72 +7,7 @@ interface RegisterViewProps {
 const RegisterView = ({ register }: RegisterViewProps) => {
     const { registers } = useMemoryContext();
 
-    const registerData = [
-        1,
-        0,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1, // first 16
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1, // sdfsd
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1, // sdfsd
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1, // sdfsd
-    ];
+    const registerData = registers[register];
 
     const formatIndex = (number: number): string => {
         const lastDigit = number % 10;

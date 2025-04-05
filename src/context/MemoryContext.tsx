@@ -54,6 +54,7 @@ const adgpRegisters: Register[] = [
 interface MemoryContextType {
     registers: CacheMemory;
     regset: (key: Register, index: number, bit: number) => void;
+    regget: (key: Register) => number;
 
     memory: Memory;
     memset: (key: number, value: number) => void;
@@ -68,16 +69,19 @@ export const MemoryProvider = ({ children }: { children: ReactNode }) => {
     const [registers, setRegisters] = useState<CacheMemory>({});
     const [memory, setMemory] = useState<Memory>({});
 
-    const regset = (key: Register, index: number, bit: number) => {
-        setRegisters((prev) => {
-            const current = prev[key] ?? create64BitArray();
-            const newReg = [...current];
-            newReg[index] = bit;
-            return {
-                ...prev,
-                [key]: newReg,
-            };
-        });
+    const regset = (key: Register, value: number) => {
+        const binary = value.toString(2).padStart(64, "0");
+        const bitArray = Array.from(binary).map((bit) => parseInt(bit));
+
+        setRegisters((prev) => ({
+            ...prev,
+            [key]: bitArray,
+        }));
+    };
+
+    const regget = (key: Register): number => {
+        const bits = registers[key] ?? Array(64).fill(0);
+        return parseInt(bits.join(""), 2);
     };
 
     const memset = (key: number, value: number) => {
@@ -92,6 +96,7 @@ export const MemoryProvider = ({ children }: { children: ReactNode }) => {
             value={{
                 registers,
                 regset,
+                regget,
                 memory,
                 memset,
                 gpRegisters,
