@@ -63,3 +63,5 @@ const useMov = () => {
 
     return { mov };
 };
+
+export default useMov;
