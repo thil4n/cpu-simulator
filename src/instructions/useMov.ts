@@ -15,7 +15,7 @@ import {
 
 const useMov = () => {
     const { registers, regset } = useRegisterContext();
-    const { setMemoryBytes, getMemoryBytes } = useMemoryContext();
+    const { setMemoryBytes, getMemoryBytes, memory } = useMemoryContext();
 
     const { info, error } = useLoggerContext();
 
@@ -58,10 +58,10 @@ const useMov = () => {
         // immediate to mem
         else if (isNumericValue(src) && isMemoryAddress(dest)) {
             const srcBytes = numberToLittleEndianBytes(src);
-
             const value = littleEndianBytesToNumber(srcBytes);
-
             setMemoryBytes(dest, srcBytes);
+
+            console.log(memory);
 
             info(`Moving ${value}  to memory address ${dest}.`);
         } else {
