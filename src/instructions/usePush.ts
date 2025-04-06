@@ -3,41 +3,51 @@ import {
     useMemoryContext,
     useRegisterContext,
 } from "@context";
-import { isRegister, isMemoryAddress, isNumericValue } from "@utils";
-import useIntcpy from "./useIntcpy";
+import {
+    isRegister,
+    bitsToBytes,
+    isNumericValue,
+    numberToLittleEndianBytes,
+    bitArrayToNumber,
+    numberToBitArray,
+} from "@utils";
 
 const usePush = () => {
     const { info, error } = useLoggerContext();
-    const { registers, regset, memory, memset } = useMemoryContext();
+    const { setMemoryBytes } = useMemoryContext();
     const { registers, regset } = useRegisterContext();
-    const intcpy = useIntcpy();
 
     const push = (operand: any) => {
-        let valueToPush: number | null = null;
+        let byteArray: number[] | null = null;
 
         if (isRegister(operand)) {
-            valueToPush = registers[operand];
-            info(
-                `Pushing the value of ${operand} register (${valueToPush}) onto the stack.`
-            );
-        } else if (isMemoryAddress(operand)) {
-            valueToPush = memory[operand] || 0;
-            info(
-                `Pushing the value from the address ${operand} (${valueToPush}) onto the stack.`
-            );
+            const bitArray = registers[operand] ?? Array(64).fill(0);
+            byteArray = bitsToBytes(bitArray);
+
+            info(`Pushing the value of ${operand} register onto the stack.`);
         } else if (isNumericValue(operand)) {
-            valueToPush = parseInt(operand);
-            info(`Pushing the value: ${valueToPush} onto the stack.`);
+            byteArray = numberToLittleEndianBytes(operand);
+            info(`Pushing the value: ${operand} onto the stack.`);
         } else {
             error("Invalid operand given for the push operation.");
             return;
         }
 
-        if (valueToPush !== null) {
-            // Decrease stack pointer (assuming a 4-byte stack)
-            const newRsp = registers.rsp - 4;
-            regset("rsp", newRsp);
+        // Ensure it's 8 bytes
+        while (byteArray.length < 8) {
+            byteArray.push(0);
         }
+
+        const rspBits = registers.rsp ?? Array(64).fill(0);
+        const rspValue = bitArrayToNumber(rspBits);
+        const newRspValue = rspValue - 8;
+
+        setMemoryBytes(newRspValue, byteArray); // Store at new RSP (after decrement)
+
+        const newRspBits = numberToBitArray(newRspValue);
+        regset("rsp", newRspBits);
+
+        info(`Updated RSP from ${rspValue} to ${newRspValue}.`);
     };
 
     return push;
