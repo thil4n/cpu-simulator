@@ -1,13 +1,21 @@
-import { useLoggerContext, useRegisterContext } from "@context";
+import {
+    useLoggerContext,
+    useMemoryContext,
+    useRegisterContext,
+} from "@context";
 import {
     isRegister,
     isNumericValue,
     numberToLittleEndianBytes,
     BytesToBits,
+    isMemoryAddress,
+    bitsToBytes,
+    littleEndianBytesToNumber,
 } from "@utils";
 
 const useMov = () => {
     const { registers, regset } = useRegisterContext();
+    const { setMemoryBytes, getMemoryBytes } = useMemoryContext();
 
     const { info } = useLoggerContext();
 
@@ -27,41 +35,35 @@ const useMov = () => {
             info(`Moving immediate value ${src} into register ${dest}.`);
         }
 
-        // // reg to mem
-        // else if (isRegister(src) && isMemoryAddress(dest)) {
-        //     const value = bitsToDecimal(registers[src] ?? []);
-        //     intcpy(dest, value);
-        //     info(
-        //         `MOV: Moving ${value} from ${src} to memory address ${dest}.`
-        //     );
-        // }
+        // reg to mem
+        else if (isRegister(src) && isMemoryAddress(dest)) {
+            const srcBits = registers[src] ?? Array(64).fill(0);
+            const srcBytes = bitsToBytes(srcBits);
+            const value = littleEndianBytesToNumber(srcBytes);
 
-        // // mem to reg
-        // else if (isMemoryAddress(src) && isRegister(dest)) {
-        //     // Assuming you fetch the memory value inside intcpy, or directly get it
-        //     const value = intcpy(src); // Or from context if you store memory elsewhere
-        //     regset(dest, value);
-        //     info(
-        //         `MOV: Moving value at memory address ${src} to register ${dest}.`
-        //     );
-        // }
+            setMemoryBytes(dest, srcBytes);
 
-        // // mem to mem
-        // else if (isMemoryAddress(src) && isMemoryAddress(dest)) {
-        //     const value = intcpy(src);
-        //     intcpy(dest, value);
-        //     info(`MOV: Moving value from memory address ${src} to ${dest}.`);
-        // }
+            info(`MOV: Moving ${value} from ${src} to memory address ${dest}.`);
+        }
 
-        // // immediate to mem
-        // else if (isNumericValue(src) && isMemoryAddress(dest)) {
-        //     intcpy(dest, parseInt(src));
-        //     info(
-        //         `MOV: Moving immediate value ${src} into memory address ${dest}.`
-        //     );
-        // } else {
-        //     error("MOV: Invalid operands given.");
-        // }
+        // mem to reg
+        else if (isMemoryAddress(src) && isRegister(dest)) {
+            const srcBytes = getMemoryBytes(src, 8);
+            regset(dest, BytesToBits(srcBytes));
+            const value = littleEndianBytesToNumber(srcBytes);
+
+            info(`MOV: Moving ${value} from ${src} to memory address ${dest}.`);
+        }
+
+        // immediate to mem
+        else if (isNumericValue(src) && isMemoryAddress(dest)) {
+            intcpy(dest, parseInt(src));
+            info(
+                `MOV: Moving immediate value ${src} into memory address ${dest}.`
+            );
+        } else {
+            error("MOV: Invalid operands given.");
+        }
     };
 
     return mov;
