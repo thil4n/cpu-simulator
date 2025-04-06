@@ -1,5 +1,3 @@
-import React from "react";
-
 const MemoryCell = ({ cell, handleExamineMemory, value }) => {
     let hex = "0x" + cell.address.toString(16).padStart(8, "0");
 

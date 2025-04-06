@@ -9,10 +9,6 @@ export const useBinaryUtils = () => {
     };
 
     return {
-        numberToLittleEndianBytes,
-        littleEndianBytesToNumber,
-        bitArrayToNumber,
-        numberToBitArray,
         getRegisterBits,
         regset,
         regget,

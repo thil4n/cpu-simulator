@@ -13,7 +13,8 @@
             "@hooks": ["src/hooks/"],
             "@config": ["src/config/"],
             "@assets": ["src/assets/"],
-            "@context": ["src/context/"]
+            "@context": ["src/context/"],
+            "@lib": ["src/lib/"]
         },
 
         /* Bundler mode */

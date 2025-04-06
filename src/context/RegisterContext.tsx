@@ -24,34 +24,9 @@ type Register =
     | "rip" //  Instruction Pointer Register
     | "rflags"; // R-Flags Register
 
-const gpRegisters: Register[] = [
-    "rax",
-    "rbx",
-    "rcx",
-    "rdx",
-    "rsi",
-    "rdi",
-    "rbp",
-    "rsp",
-];
-const adgpRegisters: Register[] = [
-    "r8",
-    "r9",
-    "r10",
-    "r11",
-    "r12",
-    "r13",
-    "r14",
-    "r15",
-];
-
 interface RegisterContextType {
     registers: CacheMemory;
     regset: (key: Register, index: number, bit: number) => void;
-    regget: (key: Register) => number;
-
-    gpRegisters: Register[];
-    adgpRegisters: Register[];
 }
 
 const RegisterContext = createContext<RegisterContextType | undefined>(
@@ -71,19 +46,11 @@ export const RegisterProvider = ({ children }: { children: ReactNode }) => {
         }));
     };
 
-    const regget = (key: Register): number => {
-        const bits = registers[key] ?? Array(64).fill(0);
-        return parseInt(bits.join(""), 2);
-    };
-
     return (
         <RegisterContext.Provider
             value={{
                 registers,
                 regset,
-                regget,
-                gpRegisters,
-                adgpRegisters,
             }}
         >
             {children}

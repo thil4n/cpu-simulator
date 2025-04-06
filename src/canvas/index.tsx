@@ -1,19 +1,18 @@
 import { useState, useEffect } from "react";
+import { Cpu } from "lucide-react";
 
+import { useLoggerContext, useMemoryContext } from "@context";
 import { Button, Input, Loader, Mobile, Modal, NavBar } from "@components";
-
 import { useForm, useModal, useScreen } from "@hooks";
+import { adgp_registers, gp_registers } from "@lib";
+import { parseSingleLine } from "@utils";
 
 import AssemblyParser from "./AssemblyParser";
 import Console from "./Console";
 import MemoryCell from "./MemoryCell";
 import MemoryView from "./MemoryView";
 
-import { parseSingleLine } from "@utils";
-
-import { useLoggerContext, useMemoryContext } from "@context";
 import useInstructions from "../instructions/useInstructions";
-import { Cpu } from "lucide-react";
 import RegisterView from "./RegisterView";
 
 interface ExamineMemory {
@@ -44,8 +43,7 @@ const Canvas = () => {
 
     const isDesktop = useScreen();
 
-    const { registers, regset, memory, memset, adgpRegisters, gpRegisters } =
-        useMemoryContext();
+    const { registers, memory, memset } = useMemoryContext();
     const { push, mov } = useInstructions();
 
     console.log(mov);
@@ -268,7 +266,7 @@ const Canvas = () => {
                         </h1>
                         <div className="grid grid-cols-3 gap-1 mt-3 px-2">
                             <div>
-                                {gpRegisters.map((register) => {
+                                {gp_registers.map((register) => {
                                     return (
                                         <Button
                                             key={register}
@@ -281,7 +279,7 @@ const Canvas = () => {
                                 })}
                             </div>
                             <div>
-                                {adgpRegisters.map((register) => {
+                                {adgp_registers.map((register) => {
                                     return (
                                         <Button
                                             key={register}
