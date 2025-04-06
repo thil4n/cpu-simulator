@@ -1,3 +1,5 @@
+import { STACK_END, STACK_START } from "@config";
+import { numberToBitArray } from "@utils";
 import { createContext, useContext, useState, ReactNode } from "react";
 
 interface CacheMemory {
@@ -33,8 +35,13 @@ const RegisterContext = createContext<RegisterContextType | undefined>(
     undefined
 );
 
+const initialRegisters: CacheMemory = {
+    rbp: numberToBitArray(STACK_START),
+    rsp: numberToBitArray(STACK_END),
+};
+
 export const RegisterProvider = ({ children }: { children: ReactNode }) => {
-    const [registers, setRegisters] = useState<CacheMemory>({});
+    const [registers, setRegisters] = useState<CacheMemory>(initialRegisters);
 
     const regset = (key: Register, bitArray: number[]) => {
         setRegisters((prev) => ({
