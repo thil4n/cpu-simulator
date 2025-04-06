@@ -209,7 +209,7 @@ const Canvas = () => {
                         </div>
                     </div>
 
-                    <div className="absolute bottom-1 w-full">
+                    <div className="absolute bottom-[50px] w-full">
                         <Console logs={logger.logs} />
                     </div>
                 </div>

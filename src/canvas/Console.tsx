@@ -3,11 +3,11 @@ import { useEffect, useRef } from "react";
 const Console = ({ logs }: { logs: { type: string; message: string }[] }) => {
     const consoleRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        if (consoleRef.current) {
-            consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
-        }
-    }, [logs]);
+    // useEffect(() => {
+    //     if (consoleRef.current) {
+    //         consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
+    //     }
+    // }, [logs]);
 
     return (
         <div
