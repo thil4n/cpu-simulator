@@ -22,7 +22,7 @@ const useMov = () => {
         // register to register
         if (isRegister(src) && isRegister(dest)) {
             const srcBits = registers[src] ?? Array(64).fill(0);
-            regset(dest, bitsToBytes(srcBits));
+            regset(dest, srcBits);
             info(`Moving value from register ${src} to register ${dest}.`);
         }
 
