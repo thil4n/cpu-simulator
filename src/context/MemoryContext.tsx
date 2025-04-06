@@ -33,6 +33,8 @@ export const MemoryProvider = ({ children }: { children: ReactNode }) => {
             });
             return updated;
         });
+
+        console.log(memory);
     };
 
     const getMemoryByte = (address: number): number => {

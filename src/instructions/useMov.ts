@@ -11,11 +11,12 @@ import {
     isMemoryAddress,
     bitsToBytes,
     littleEndianBytesToNumber,
+    parseAddr,
 } from "@utils";
 
 const useMov = () => {
     const { registers, regset } = useRegisterContext();
-    const { setMemoryBytes, getMemoryBytes, memory } = useMemoryContext();
+    const { setMemoryBytes, getMemoryBytes } = useMemoryContext();
 
     const { info, error } = useLoggerContext();
 
@@ -28,7 +29,7 @@ const useMov = () => {
         }
 
         // immediate to reg
-        if (isNumericValue(src) && isRegister(dest)) {
+        else if (isNumericValue(src) && isRegister(dest)) {
             const srcBytes = numberToLittleEndianBytes(src);
 
             regset(dest, BytesToBits(srcBytes));
@@ -59,9 +60,12 @@ const useMov = () => {
         else if (isNumericValue(src) && isMemoryAddress(dest)) {
             const srcBytes = numberToLittleEndianBytes(src);
             const value = littleEndianBytesToNumber(srcBytes);
-            setMemoryBytes(dest, srcBytes);
 
-            console.log(memory);
+            const address = parseAddr(dest);
+
+            console.log(address);
+
+            setMemoryBytes(address, srcBytes);
 
             info(`Moving ${value}  to memory address ${dest}.`);
         } else {
