@@ -1,19 +1,23 @@
 import { useState, useEffect } from "react";
 import { Cpu } from "lucide-react";
 
-import { useLoggerContext, useMemoryContext } from "@context";
+import {
+    useLoggerContext,
+    useMemoryContext,
+    useRegisterContext,
+} from "@context";
 import { Button, Input, Loader, Mobile, Modal, NavBar } from "@components";
 import { useForm, useModal, useScreen } from "@hooks";
 import { adgp_registers, gp_registers } from "@lib";
-import { parseSingleLine } from "@utils";
+import { bitArrayToNumber, parseSingleLine } from "@utils";
 
 import AssemblyParser from "./AssemblyParser";
 import Console from "./Console";
-import MemoryCell from "./MemoryCell";
 import MemoryView from "./MemoryView";
 
 import useInstructions from "../instructions/useInstructions";
 import RegisterView from "./RegisterView";
+import MemoryBar from "./MemoryBar";
 
 interface ExamineMemory {
     startAddress: number;
@@ -28,7 +32,9 @@ const Canvas = () => {
     const [examineMemory, setExamineMemory] = useState<ExamineMemory | null>(
         null
     );
+
     const [instructions, setInstructions] = useState([]);
+    const [memoryRange, setMemRange] = useState<number[]>([]);
 
     const { modalStatus, openModal, closeModal } = useModal();
 
@@ -37,28 +43,24 @@ const Canvas = () => {
         addrInput: "",
     });
 
-    const [memoryRange, setMemRange] = useState([]);
-
-    const logger = useLoggerContext();
-
     const isDesktop = useScreen();
 
-    const { registers, memory, memset } = useMemoryContext();
+    const logger = useLoggerContext();
+    const { memory } = useMemoryContext();
+    const { registers } = useRegisterContext();
+
     const { push, mov } = useInstructions();
 
-    const showMemory = (startAddr: number, highlightLength = 0) => {
+    const showMemory = (startAddr: number) => {
         const endAddr = startAddr + 200;
         let memRange = [];
         for (let index = startAddr; index < endAddr; index += 8) {
-            memRange.push({
-                address: index,
-                highlight: index - startAddr < highlightLength,
-            });
+            memRange.push(index);
         }
         setMemRange(memRange);
     };
 
-    const handleClickRegister = (register) => {
+    const handleClickRegister = (register: string) => {
         setSelectedRegister(register);
         openModal("registerModal");
     };
@@ -95,10 +97,6 @@ const Canvas = () => {
     useEffect(() => {
         showMemory(1000);
     }, []);
-
-    const execute = () => {
-        parseAssembly();
-    };
 
     const [loadingState, setLoadingState] = useState(false);
 
@@ -152,27 +150,16 @@ const Canvas = () => {
 
             <NavBar />
             <div className="grid grid-cols-12 gap-2 fixed top-[30px]">
-                <div
-                    className="h-screen  overflow-y-auto w-full col-span-2 "
-                    id="style-1"
-                >
-                    {memoryRange.map((cell) => {
-                        return (
-                            <MemoryCell
-                                cell={cell}
-                                key={Math.random()}
-                                handleExamineMemory={() => {
-                                    setExamineMemory({
-                                        startAddress: cell.address,
-                                        wordCount: 8,
-                                    });
-                                    openModal("memoryModal");
-                                }}
-                                value={memory[cell.address]}
-                            />
-                        );
-                    })}
-                </div>
+                <MemoryBar
+                    handleExamineMemory={(address) => {
+                        setExamineMemory({
+                            startAddress: address,
+                            wordCount: 8,
+                        });
+                        openModal("memoryModal");
+                    }}
+                    memoryRange={memoryRange}
+                />
                 <div className="relative min-h-screen flex flex-col col-span-7 w-full mt-4">
                     <div className="w-full col-span-5">
                         <h1 className="bg-primary text-secondary w-full py-1 text-sm text-center uppercase">
@@ -314,10 +301,13 @@ const Canvas = () => {
                                 <Button
                                     text={"Stack"}
                                     handleClick={() => {
-                                        const rbp = registers.rbp;
-                                        const rsp = registers.rsp;
-                                        const stackLength = rsp - rbp;
-                                        showMemory(rbp, stackLength);
+                                        const rsp = bitArrayToNumber(
+                                            registers.rsp
+                                        );
+
+                                        logger.info("Showing the stack area");
+
+                                        showMemory(rsp);
                                     }}
                                 />
                                 <Button

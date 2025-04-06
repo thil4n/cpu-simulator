@@ -4,7 +4,7 @@ interface ModalProps {
     handleClose: () => void;
     title: string;
     children: ReactNode;
-    className: string;
+    className?: string;
 }
 
 const Modal: React.FC<ModalProps> = ({
