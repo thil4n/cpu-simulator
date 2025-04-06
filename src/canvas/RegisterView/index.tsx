@@ -12,6 +12,8 @@ const RegisterView = ({ register }: RegisterViewProps) => {
 
     const registerData = registers[register] || create64BitArray();
 
+    console.log(registerData);
+
     const whole_register = registerData;
     const first_32_bits = registerData.slice(0, 32);
     const first_16_bits = registerData.slice(0, 16);

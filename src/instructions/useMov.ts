@@ -4,6 +4,8 @@ import {
     isMemoryAddress,
     isNumericValue,
     numberToLittleEndianBytes,
+    bitsToBytes,
+    BytesToBits,
 } from "@utils";
 import useIntcpy from "./useIntcpy";
 
@@ -17,12 +19,20 @@ const useMov = () => {
         parseInt(bits.join(""), 2);
 
     const mov = (src: any, dest: any) => {
-        // // reg to reg
-        // if (isRegister(src) && isRegister(dest)) {
-        //     const value = bitsToDecimal(registers[src] ?? []);
-        //     regset(dest, value);
-        //     info(`MOV: Moving ${value} from ${src} to ${dest}.`);
-        // }
+        // register to register
+        if (isRegister(src) && isRegister(dest)) {
+            const srcBits = registers[src] ?? Array(64).fill(0);
+            regset(dest, bitsToBytes(srcBits));
+            info(`Moving value from register ${src} to register ${dest}.`);
+        }
+
+        // immediate to reg
+        if (isNumericValue(src) && isRegister(dest)) {
+            const srcBytes = numberToLittleEndianBytes(src);
+
+            regset(dest, BytesToBits(srcBytes));
+            info(`Moving immediate value ${src} into register ${dest}.`);
+        }
 
         // // reg to mem
         // else if (isRegister(src) && isMemoryAddress(dest)) {
@@ -49,12 +59,6 @@ const useMov = () => {
         //     intcpy(dest, value);
         //     info(`MOV: Moving value from memory address ${src} to ${dest}.`);
         // }
-
-        // immediate to reg
-        if (isNumericValue(src) && isRegister(dest)) {
-            regset(dest, numberToLittleEndianBytes(src));
-            info(`Moving immediate value ${src} into register ${dest}.`);
-        }
 
         // // immediate to mem
         // else if (isNumericValue(src) && isMemoryAddress(dest)) {

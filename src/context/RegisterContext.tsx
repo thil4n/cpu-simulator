@@ -27,7 +27,7 @@ type Register =
 
 interface RegisterContextType {
     registers: CacheMemory;
-    regset: (key: Register, bytes: number[]) => void;
+    regset: (key: Register, bitArray: number[]) => void;
 }
 
 const RegisterContext = createContext<RegisterContextType | undefined>(
@@ -37,18 +37,7 @@ const RegisterContext = createContext<RegisterContextType | undefined>(
 export const RegisterProvider = ({ children }: { children: ReactNode }) => {
     const [registers, setRegisters] = useState<CacheMemory>({});
 
-    const regset = (key: Register, bytes: number[]) => {
-        const bitArray: number[] = [];
-
-        bytes.forEach((byte) => {
-            const bits = byte
-                .toString(2)
-                .padStart(8, "0")
-                .split("")
-                .map(Number);
-            bitArray.push(...bits.reverse()); // LSB first in each byte
-        });
-
+    const regset = (key: Register, bitArray: number[]) => {
         setRegisters((prev) => ({
             ...prev,
             [key]: bitArray,

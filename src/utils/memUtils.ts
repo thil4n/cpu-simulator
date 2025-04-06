@@ -31,3 +31,26 @@ export const numberToBitArray = (value: number): number[] => {
     const binary = value.toString(2).padStart(64, "0");
     return Array.from(binary).map((bit) => parseInt(bit));
 };
+
+export const bitsToBytes = (bitArray: number[]): number[] => {
+    const bytes: number[] = [];
+
+    for (let i = 0; i < 64; i += 8) {
+        const byteBits = bitArray.slice(i, i + 8).reverse(); // MSB first per byte
+        const byte = parseInt(byteBits.join(""), 2);
+        bytes.push(byte);
+    }
+
+    return bytes;
+};
+
+export const BytesToBits = (byteArray: number[]): number[] => {
+    const bitArray: number[] = [];
+
+    byteArray.forEach((byte) => {
+        const bits = byte.toString(2).padStart(8, "0").split("").map(Number);
+        bitArray.push(...bits.reverse()); // LSB first in each byte
+    });
+
+    return bitArray;
+};
