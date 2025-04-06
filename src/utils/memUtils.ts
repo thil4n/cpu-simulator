@@ -1,12 +1,11 @@
 // Converts number → [byte0, byte1, ..., byte7] (LSB first)
 export const numberToLittleEndianBytes = (value: number | bigint): number[] => {
-    const big = BigInt(value); // Convert to BigInt to support full 64-bit
+    const big = BigInt(value);
     const bytes = [];
 
     for (let i = 0n; i < 8n; i++) {
         const shifted = (big >> (i * 8n)) & 0xffn;
         bytes.push(Number(shifted));
-        console.log(`Byte ${i}:`, shifted.toString(16));
     }
 
     return bytes;
