@@ -17,7 +17,7 @@ const useMov = () => {
     const { registers, regset } = useRegisterContext();
     const { setMemoryBytes, getMemoryBytes } = useMemoryContext();
 
-    const { info } = useLoggerContext();
+    const { info, error } = useLoggerContext();
 
     const mov = (src: any, dest: any) => {
         // register to register
@@ -43,7 +43,7 @@ const useMov = () => {
 
             setMemoryBytes(dest, srcBytes);
 
-            info(`MOV: Moving ${value} from ${src} to memory address ${dest}.`);
+            info(`Moving ${value} from ${src} to memory address ${dest}.`);
         }
 
         // mem to reg
@@ -52,17 +52,20 @@ const useMov = () => {
             regset(dest, BytesToBits(srcBytes));
             const value = littleEndianBytesToNumber(srcBytes);
 
-            info(`MOV: Moving ${value} from ${src} to memory address ${dest}.`);
+            info(`Moving ${value} from ${src} to memory address ${dest}.`);
         }
 
         // immediate to mem
         else if (isNumericValue(src) && isMemoryAddress(dest)) {
-            intcpy(dest, parseInt(src));
-            info(
-                `MOV: Moving immediate value ${src} into memory address ${dest}.`
-            );
+            const srcBytes = numberToLittleEndianBytes(src);
+
+            const value = littleEndianBytesToNumber(srcBytes);
+
+            setMemoryBytes(dest, srcBytes);
+
+            info(`Moving ${value}  to memory address ${dest}.`);
         } else {
-            error("MOV: Invalid operands given.");
+            error("Invalid operands given.");
         }
     };
 
