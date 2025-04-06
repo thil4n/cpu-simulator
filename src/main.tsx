@@ -3,14 +3,16 @@ import ReactDOM from "react-dom/client";
 import "./assets/css/main.css";
 import Canvas from "./canvas";
 
-import { MemoryProvider, LoggerProvider } from "@context";
+import { MemoryProvider, LoggerProvider, RegisterProvider } from "@context";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <LoggerProvider>
-      <MemoryProvider>
-        <Canvas />
-      </MemoryProvider>
-    </LoggerProvider>
-  </React.StrictMode>
+    <React.StrictMode>
+        <LoggerProvider>
+            <RegisterProvider>
+                <MemoryProvider>
+                    <Canvas />
+                </MemoryProvider>
+            </RegisterProvider>
+        </LoggerProvider>
+    </React.StrictMode>
 );

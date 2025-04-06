@@ -1,10 +1,11 @@
-import { useMemoryContext, useLoggerContext } from "@context";
+import { useLoggerContext, useRegisterContext } from "@context";
 import { isRegister, isMemoryAddress, isNumericValue } from "@utils";
 import useIntcpy from "./useIntcpy";
 
 const useMov = () => {
-    const { registers, regset } = useMemoryContext();
-    const { info, error } = useLoggerContext();
+    const { registers, regset } = useRegisterContext();
+
+    const { info } = useLoggerContext();
     const { intcpy } = useIntcpy();
 
     const bitsToDecimal = (bits: number[]): number =>
