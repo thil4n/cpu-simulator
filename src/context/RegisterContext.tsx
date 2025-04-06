@@ -1,3 +1,4 @@
+import { littleEndianBytesToNumber } from "@utils";
 import { createContext, useContext, useState, ReactNode } from "react";
 
 interface CacheMemory {
@@ -26,7 +27,7 @@ type Register =
 
 interface RegisterContextType {
     registers: CacheMemory;
-    regset: (key: Register, index: number, bit: number) => void;
+    regset: (key: Register, bytes: number[]) => void;
 }
 
 const RegisterContext = createContext<RegisterContextType | undefined>(
@@ -36,9 +37,17 @@ const RegisterContext = createContext<RegisterContextType | undefined>(
 export const RegisterProvider = ({ children }: { children: ReactNode }) => {
     const [registers, setRegisters] = useState<CacheMemory>({});
 
-    const regset = (key: Register, value: number) => {
-        const binary = value.toString(2).padStart(64, "0");
-        const bitArray = Array.from(binary).map((bit) => parseInt(bit));
+    const regset = (key: Register, bytes: number[]) => {
+        const bitArray: number[] = [];
+
+        bytes.forEach((byte) => {
+            const bits = byte
+                .toString(2)
+                .padStart(8, "0")
+                .split("")
+                .map(Number);
+            bitArray.push(...bits.reverse()); // LSB first in each byte
+        });
 
         setRegisters((prev) => ({
             ...prev,

@@ -46,8 +46,6 @@ const Canvas = () => {
     const { registers, memory, memset } = useMemoryContext();
     const { push, mov } = useInstructions();
 
-    console.log(mov);
-
     const showMemory = (startAddr: number, highlightLength = 0) => {
         const endAddr = startAddr + 200;
         let memRange = [];

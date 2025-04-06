@@ -1,4 +1,4 @@
-import { useMemoryContext } from "@context";
+import { useRegisterContext } from "@context";
 import BitSet from "./BitSet";
 
 interface RegisterViewProps {
@@ -8,11 +8,9 @@ interface RegisterViewProps {
 const create64BitArray = (): number[] => new Array(64).fill(0);
 
 const RegisterView = ({ register }: RegisterViewProps) => {
-    const { registers } = useMemoryContext();
+    const { registers } = useRegisterContext();
 
     const registerData = registers[register] || create64BitArray();
-
-    console.log(registerData);
 
     const whole_register = registerData;
     const first_32_bits = registerData.slice(0, 32);
