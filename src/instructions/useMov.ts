@@ -1,22 +1,15 @@
 import { useLoggerContext, useRegisterContext } from "@context";
 import {
     isRegister,
-    isMemoryAddress,
     isNumericValue,
     numberToLittleEndianBytes,
-    bitsToBytes,
     BytesToBits,
 } from "@utils";
-import useIntcpy from "./useIntcpy";
 
 const useMov = () => {
     const { registers, regset } = useRegisterContext();
 
     const { info } = useLoggerContext();
-    const { intcpy } = useIntcpy();
-
-    const bitsToDecimal = (bits: number[]): number =>
-        parseInt(bits.join(""), 2);
 
     const mov = (src: any, dest: any) => {
         // register to register
