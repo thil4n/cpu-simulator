@@ -8,8 +8,6 @@ interface Memory {
     [key: number]: number;
 }
 
-const create64BitArray = (): number[] => new Array(64).fill(0);
-
 type Register =
     | "rax" // Accumulator Register
     | "rbx" // Base Register

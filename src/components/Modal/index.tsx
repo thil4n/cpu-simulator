@@ -19,7 +19,7 @@ const Modal: React.FC<ModalProps> = ({
                 <div
                     className={`shadow-xl transition-all w-[25%] mx-auto mt-[100px] rounded-lg bg-[#2d3436] ${className}`}
                 >
-                    <div className="w-full bg-primary text-secondary text-xl mb-6 flex items-center justify-between">
+                    <div className="w-full bg-primary text-secondary text-md mb-6 flex items-center justify-between">
                         <h3 className="mx-auto py-1">{title}</h3>
                         <span
                             className="bg-slate-500 hover:bg-secondary px-3 py-1 cursor-pointer"
