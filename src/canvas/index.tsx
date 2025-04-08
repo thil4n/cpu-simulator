@@ -151,7 +151,7 @@ const Canvas = () => {
             <NavBar />
             <div className="grid grid-cols-12 gap-2 fixed top-[30px]">
                 <MemoryBar
-                    handleExamineMemory={(address) => {
+                    handleExamineMemory={(address: any) => {
                         setExamineMemory({
                             startAddress: address,
                             wordCount: 8,
