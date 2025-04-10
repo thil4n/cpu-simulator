@@ -1,4 +1,4 @@
-import { GitFork, Info, Heart, Cpu } from "lucide-react";
+import { GitFork, Heart, Cpu } from "lucide-react";
 
 const NavBar = () => {
   const baseUrl = import.meta.env.VITE_BASE_URL;

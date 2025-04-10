@@ -95,7 +95,8 @@ const App = () => {
     showMemory(1000);
   }, []);
 
-  const [loadingState, setLoadingState] = useState(false);
+  const loadingEnabled = import.meta.env.VITE_SHOW_LOADING;
+  const [loadingState, setLoadingState] = useState(loadingEnabled);
 
   return (
     <div className="w-full h-screen bg-[#2d3436]">
