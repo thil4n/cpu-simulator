@@ -1,11 +1,13 @@
 import { GitFork, Info, Heart, Cpu } from "lucide-react";
 
 const NavBar = () => {
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+
   return (
     <nav className="z-30 fixed top-0 left-0 w-full h-8 bg-primary border-b-2 border-slate-500 shadow-md">
       <div className="px-4 mx-auto flex justify-between items-center h-full text-white">
         <a
-          href="/fork"
+          href={baseUrl}
           className="flex items-center gap-1 hover:text-gray-300 font-medium"
         >
           <Cpu size={20} /> CPU Simulator
