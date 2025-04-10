@@ -24,7 +24,7 @@ interface ExamineMemory {
   wordCount: number;
 }
 
-const Canvas = () => {
+const App = () => {
   const [selectedRegister, setSelectedRegister] = useState<string | null>(null);
 
   const [examineMemory, setExamineMemory] = useState<ExamineMemory | null>(
@@ -337,4 +337,4 @@ const Canvas = () => {
   );
 };
 
-export default Canvas;
+export default App;

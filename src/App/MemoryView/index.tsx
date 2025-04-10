@@ -1,7 +1,7 @@
 import { Input, Select } from "@components";
 import { useMemoryContext } from "@context";
 import { useForm } from "@hooks";
-import { log } from "console";
+
 import { useEffect, useState } from "react";
 
 interface Cell {
