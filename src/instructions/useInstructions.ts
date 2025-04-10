@@ -1,4 +1,3 @@
-import useIntcpy from "./useIntcpy";
 import useMov from "./useMov";
 import usePush from "./usePush";
 import useStrcpy from "./useStrcpy";
@@ -6,7 +5,6 @@ import useStrcpy from "./useStrcpy";
 const useInstructions = () => {
   const push = usePush();
   const strcpy = useStrcpy();
-  const intcpy = useIntcpy();
   const mov = useMov();
 
   // const add = useAdd();
@@ -28,6 +26,6 @@ const useInstructions = () => {
 
 
   
-  return { push,  strcpy, intcpy, mov, /*pop,add, sub, mul, div, cmp, jmp, call, ret, and, or, xor, not, inc, dec */ };
+  return { push,  strcpy, mov, /*pop,add, sub, mul, div, cmp, jmp, call, ret, and, or, xor, not, inc, dec */ };
 }
 export default useInstructions;
