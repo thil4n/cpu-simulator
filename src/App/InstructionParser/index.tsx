@@ -1,9 +1,11 @@
 import { Button, TextArea } from "@components";
 import { useForm } from "@hooks";
-import { AssemblyParserProps, Instruction } from "@interfaces";
+import { InstructionParserProps, Instruction } from "@interfaces";
 import { parseSingleLine } from "@utils";
 
-const AssemblyParser: React.FC<AssemblyParserProps> = ({ setInstructions }) => {
+const InstructionParser: React.FC<InstructionParserProps> = ({
+  setInstructions,
+}) => {
   const { formData, handleChange } = useForm({
     instructions: "",
   });
@@ -25,20 +27,24 @@ const AssemblyParser: React.FC<AssemblyParserProps> = ({ setInstructions }) => {
   };
 
   return (
-    <div>
-      <TextArea
-        name="instructions"
-        handleChange={handleChange}
-        value={formData.instructions}
-        rows={10}
-      />
-      <Button
-        text={`Prase Instructions`}
-        handleClick={praseInstructions}
-        className="w-full"
-      />
+    <div className="flex gap-4">
+      <div>Sample programs</div>
+      <div>
+        {" "}
+        <TextArea
+          name="instructions"
+          handleChange={handleChange}
+          value={formData.instructions}
+          rows={10}
+        />
+        <Button
+          text={`Prase Instructions`}
+          handleClick={praseInstructions}
+          className="w-full"
+        />
+      </div>
     </div>
   );
 };
 
-export default AssemblyParser;
+export default InstructionParser;

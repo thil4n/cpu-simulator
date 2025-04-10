@@ -11,7 +11,7 @@ import { useForm, useModal, useScreen } from "@hooks";
 import { adgp_registers, gp_registers } from "@lib";
 import { bitArrayToNumber, parseSingleLine } from "@utils";
 
-import AssemblyParser from "./AssemblyParser";
+import InstructionParser from "./InstructionParser";
 import Console from "./Console";
 import MemoryView from "./MemoryView";
 
@@ -107,7 +107,7 @@ const App = () => {
             closeModal("instructionModal");
           }}
         >
-          <AssemblyParser
+          <InstructionParser
             setInstructions={(cpuInstructions) => {
               setInstructions(cpuInstructions);
               closeModal("instructionModal");
