@@ -1,5 +1,7 @@
 import { Input, Select } from "@components";
+import { useMemoryContext } from "@context";
 import { useForm } from "@hooks";
+import { log } from "console";
 import { useEffect, useState } from "react";
 
 interface Cell {
@@ -8,6 +10,8 @@ interface Cell {
 }
 
 const MemoryView = ({ startAddress, wordCount = 24 }) => {
+  const { getMemoryBytes } = useMemoryContext();
+
   const { formData, handleChange } = useForm({
     startAddress: startAddress || 2000,
     wordCount: wordCount,
@@ -41,20 +45,24 @@ const MemoryView = ({ startAddress, wordCount = 24 }) => {
   };
 
   const buildMemoryView = () => {
-    let cells = [];
+    const wordSize = parseInt(formData.wordSize);
+    const start = parseInt(formData.startAddress);
+    const count = parseInt(formData.wordCount);
 
-    for (let i = 0; i < parseInt(formData.wordCount); i++) {
-      const address =
-        parseInt(formData.startAddress) + i * parseInt(formData.wordSize);
+    const bytes = getMemoryBytes(start, count * wordSize);
 
-      // Fallback to 0 if undefined
-      // const value = memory[address] ? parseInt(memory[address], 2) : 0;
-      const value = 0;
+    const cells: Cell[] = [];
 
-      cells.push({
-        address,
-        value,
-      });
+    for (let i = 0; i < count; i++) {
+      const address = start + i * wordSize;
+      let value = 0;
+
+      for (let j = 0; j < wordSize; j++) {
+        const byte = bytes[i * wordSize + j] ?? 0;
+        value |= byte << (8 * j); // Little-endian
+      }
+
+      cells.push({ address, value });
     }
 
     setMemoryCells(cells);
@@ -169,6 +177,8 @@ const MemoryView = ({ startAddress, wordCount = 24 }) => {
           : formData.wordSize == 4
           ? "col-span-4"
           : formData.wordSize == 2
+          ? "col-span-2"
+          : formData.wordSize == 1 && formData.displayType == "binary"
           ? "col-span-2"
           : "col-span-1"
       }
