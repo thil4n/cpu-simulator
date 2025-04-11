@@ -16,3 +16,11 @@ export const parseSingleLine = (line: string) => {
 export const parseAddr = (address: string) => {
     return parseInt(address.substring(2), 16);
 };
+
+
+export const parseImmediate = (value: string) => {
+    if (value.startsWith("0x")) {
+      return parseInt(value, 16);
+    }
+    return parseInt(value, 10);
+};

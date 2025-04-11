@@ -1,5 +1,6 @@
 export interface Register {
   key: string;
+  code: number;
   desc: string;
 }
 

@@ -1,37 +1,46 @@
-import { isNumericValue } from "@utils";
+import { isNumericValue, isRegister } from "@utils";
 import { operations } from "./operations";
+import { registers } from "./registers";
 
-function findRegisterCode(regName) {
-    regName = regName.toLowerCase();
-    for (const [name, data] of Object.entries(registers)) {
-      if (name === regName || data.aliases.includes(regName)) {
-        return { reg: name, code: data.code };
-      }
-    }
-    throw new Error(`Unknown register: ${regName}`);
-  }
-  
+
 
   
-  function getOpcode(instruction) {
-    const parts = instruction.replace(",", "").trim().split(/\s+/);
+  export const assemble = (parts: string[]) => {
     const [mnemonic, op1, op2] = parts;
   
     if (!operations[mnemonic]) {
       throw new Error(`Unsupported instruction: ${mnemonic}`);
     }
-  
+    if (!op1) {
+      throw new Error(`Missing operand for instruction: ${mnemonic}`);
+    }
+
+
     // Single operand (e.g., push rax)
     if (!op2) {
-      const { code: regCode } = findRegisterCode(op1);
+      const regCode  = registers[op2].code;
+
+      if (regCode === undefined) {
+        throw new Error(`Invalid register: ${op1}`);
+      }
       const opcode = operations[mnemonic].code + regCode;
       return [opcode];
     }
   
     // If the second operand is a register
-    if (!isNumericValue(op2)) {
-      const reg1 = findRegisterCode(op1);
-      const reg2 = findRegisterCode(op2);
+    if (isRegister(op2)) {
+      const reg1 = registers[op1];
+      const reg2 = registers[op2];
+  
+      const opcode = operations[mnemonic].code;
+      const modRM = 0xC0 | (reg2.code << 3) | reg1.code;
+      return [opcode, modRM];
+    }
+
+    // If the second operand is a number
+    if (isNumericValue(op2)) {
+      const reg1 = registers[op1];
+      const reg2 = op2;
   
       const opcode = operations[mnemonic].code;
       const modRM = 0xC0 | (reg2.code << 3) | reg1.code;
