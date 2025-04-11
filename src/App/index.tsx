@@ -95,7 +95,7 @@ const App = () => {
     showMemory(1000);
   }, []);
 
-  const loadingEnabled = import.meta.env.VITE_SHOW_LOADING;
+  const loadingEnabled = import.meta.env.VITE_SHOW_LOADING == "true";
   const [loadingState, setLoadingState] = useState(loadingEnabled);
 
   return (
