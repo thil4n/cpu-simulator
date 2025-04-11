@@ -53,6 +53,7 @@ const InstructionParser: React.FC<InstructionParserProps> = ({
         handleChange={handleChange}
         value={formData.instructions}
         rows={10}
+        inputClassName="p-4 text-secondary"
       />
 
       <Button

@@ -206,7 +206,8 @@ const App = () => {
                 <Button
                   text="Clear"
                   handleClick={() => {
-                    openModal("instructionModal");
+                    setInstructions([]);
+                    logger.info("Cleared the instructions.");
                   }}
                 />
               </div>
