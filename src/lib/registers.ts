@@ -14,12 +14,12 @@ const registers: CacheMem = {
 
     r8: { key: "r8",  code: 0x8 ,desc: "R8 Register" },
     r9: { key: "r9",  code: 0x9 ,desc: "R9 Register" },
-    r10: { key: "r10", code: 0x10 , desc: "R10 Register" },
-    r11: { key: "r11", code: 0x11 , desc: "R11 Register" },
-    r12: { key: "r12", code: 0x12 , desc: "R12 Register" },
-    r13: { key: "r13", code: 0x13 , desc: "R13 Register" },
-    r14: { key: "r14", code: 0x14 , desc: "R14 Register" },
-    r15: { key: "r15", code: 0x15 , desc: "R15 Register" },
+    r10: { key: "r10", code: 0xA , desc: "R10 Register" },
+    r11: { key: "r11", code: 0xB , desc: "R11 Register" },
+    r12: { key: "r12", code: 0xC , desc: "R12 Register" },
+    r13: { key: "r13", code: 0xD , desc: "R13 Register" },
+    r14: { key: "r14", code: 0xE , desc: "R14 Register" },
+    r15: { key: "r15", code: 0xF , desc: "R15 Register" },
 
     rip: { key: "rip", code: 0x16 , desc: "Instruction Pointer Register" },
 

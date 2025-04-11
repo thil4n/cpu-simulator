@@ -13,18 +13,22 @@ export const assemble = (parts: string[]) => {
   }
 
   // Single operand (e.g., push rax)
-  if (!op2) {
-    const regCode = registers[op2].code;
+  if (op2 == null) {
+    
+    const regCode = registers[op1].code;
 
     if (regCode === undefined) {
       throw new Error(`Invalid register: ${op1}`);
     }
+
+    console.log(regCode);
+    
     const opcode = operations[mnemonic].code + regCode;
     return [opcode];
   }
 
   // If the second operand is a register
-  if (isRegister(op2)) {
+  else if (isRegister(op2)) {
     const reg1 = registers[op1];
     const reg2 = registers[op2];
 
@@ -34,7 +38,7 @@ export const assemble = (parts: string[]) => {
   }
 
   // If the second operand is a number
-  if (isNumericValue(op2)) {
+  else if (isNumericValue(op2)) {
     // Handle immediate operand (e.g., mov rax, 0x5)
     const reg = registers[op1];
     const immValue = parseImmediate(op2);

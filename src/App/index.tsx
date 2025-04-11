@@ -8,7 +8,7 @@ import {
 } from "@context";
 import { Button, Input, Loader, Mobile, Modal, NavBar } from "@components";
 import { useForm, useModal, useScreen } from "@hooks";
-import { adgp_registers, gp_registers } from "@lib";
+import { adgp_registers, gp_registers, assemble } from "@lib";
 import { bitArrayToNumber, parseSingleLine } from "@utils";
 
 import InstructionParser from "./InstructionParser";
@@ -73,6 +73,16 @@ const App = () => {
         operandTwo ? " and operand two is " + operandTwo : "."
       }`
     );
+
+    const opcode = assemble([operation, operandOne, operandTwo]);
+
+    logger.info(`Opcode is ${opcode}`);
+    if (opcode.length == 0) {
+      logger.error("No opcode generated.");
+      return;
+    }
+
+    return;
 
     switch (operation) {
       case "mov":
