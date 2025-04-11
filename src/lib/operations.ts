@@ -1,9 +1,4 @@
-const registers = {
-    rax: { code: 0x0, size: 64, aliases: ["eax", "ax", "al", "ah"] },
-    rcx: { code: 0x1, size: 64, aliases: ["ecx", "cx", "cl", "ch"] },
-    // ...
-  };
-const operations = {
+export const operations = {
     // Arithmetic operations
     add: { code: 0x01, size: 1 },
     sub: { code: 0x29, size: 1 },
