@@ -5,19 +5,18 @@ import {
     useMemoryContext,
     useRegisterContext,
 } from "@context";
-import { Button, Input, Loader, Mobile, Modal, NavBar } from "@components";
-import { useForm, useModal, useScreen } from "@hooks";
-import { adgp_registers, gp_registers, assemble } from "@lib";
-import { bitArrayToNumber, parseSingleLine } from "@utils";
+import { Button, Loader, Mobile, Modal, NavBar } from "@components";
+import { useModal, useScreen } from "@hooks";
+import { adgp_registers, gp_registers } from "@lib";
+import { bitArrayToNumber } from "@utils";
 
-import InstructionParser from "./InstructionParser";
 import Console from "./Console";
 import MemoryView from "./MemoryView";
 
-import useInstructions from "../instructions/useInstructions";
 import RegisterView from "./RegisterView";
 import MemoryBar from "./MemoryBar";
 import InstructionView from "./InstructionView";
+import ExecutionController from "./ExecutionController";
 
 interface ExamineMemory {
     startAddress: number;
@@ -33,23 +32,14 @@ const App = () => {
         null
     );
 
-    const [instructions, setInstructions] = useState([]);
     const [memoryRange, setMemRange] = useState<number[]>([]);
-
     const { modalStatus, openModal, closeModal } = useModal();
-
-    const { formData, handleChange } = useForm({
-        assemblyInput: "",
-        addrInput: "",
-    });
 
     const isDesktop = useScreen();
 
     const logger = useLoggerContext();
     const { memory } = useMemoryContext();
     const { registers } = useRegisterContext();
-
-    const { push, mov } = useInstructions();
 
     const showMemory = (startAddr: number) => {
         const endAddr = startAddr + 200;
@@ -65,53 +55,6 @@ const App = () => {
         openModal("registerModal");
     };
 
-    const parseAssembly = () => {
-        const instruction = formData.assemblyInput;
-
-        const { operation, operandOne, operandTwo } =
-            parseSingleLine(instruction);
-
-        logger.info(
-            `Parsing the instruction ${operation} with operand one is ${operandOne} ${
-                operandTwo ? " and operand two is " + operandTwo : "."
-            }`
-        );
-
-        const opcode = assemble({ operation, operandOne, operandTwo });
-
-        function printHex(bytes: any[]) {
-            return bytes
-                .map((b: { toString: (arg0: number) => string }) =>
-                    b.toString(16).padStart(2, "0")
-                )
-                .join(" ");
-        }
-
-        logger.info(`Opcode is ${printHex(opcode)}`);
-        if (opcode.length == 0) {
-            logger.error("No opcode generated.");
-            return;
-        }
-
-        return;
-
-        switch (operation) {
-            case "mov":
-                const src = operandTwo;
-                const dest = operandOne;
-                mov(src, dest);
-                break;
-
-            case "push":
-                push(operandOne);
-                break;
-
-            default:
-                logger.error("Invalid operation given.");
-                break;
-        }
-    };
-
     useEffect(() => {
         showMemory(1000);
     }, []);
@@ -121,22 +64,6 @@ const App = () => {
 
     return (
         <div className="w-full h-screen bg-[#2d3436]">
-            {modalStatus.instructionModal && (
-                <Modal
-                    title="Instructions"
-                    handleClose={() => {
-                        closeModal("instructionModal");
-                    }}
-                >
-                    <InstructionParser
-                        handleClose={() => {
-                            logger.info("Program loading completed.");
-                            closeModal("instructionModal");
-                        }}
-                    />
-                </Modal>
-            )}
-
             {modalStatus.registerModal && selectedRegister && (
                 <Modal
                     handleClose={() => {
@@ -190,52 +117,7 @@ const App = () => {
                 </div>
 
                 <div className="w-full col-span-3 mt-4">
-                    <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg">
-                        <h1 className="bg-primary text-secondary w-full py-1 text-sm text-center uppercase mb-3">
-                            CONTROL EXECUTION
-                        </h1>
-                        <div className="px-2">
-                            <div className="grid grid-cols-2 gap-1">
-                                <Button
-                                    text="LOAD PROGRAM"
-                                    handleClick={() => {
-                                        openModal("instructionModal");
-                                    }}
-                                />
-                                <Button
-                                    text="Clear"
-                                    handleClick={() => {
-                                        setInstructions([]);
-                                        logger.info(
-                                            "Cleared the instructions."
-                                        );
-                                    }}
-                                />
-                            </div>
-                            <div className="">
-                                <Input
-                                    name="assemblyInput"
-                                    value={formData.assemblyInput}
-                                    handleChange={handleChange}
-                                    className=" bg-[#555] bg-opacity-50 backdrop-blur-lg text-secondary"
-                                />
-                            </div>
-                            <div className="grid grid-cols-3 gap-1 -mt-1">
-                                <Button
-                                    text="BACK"
-                                    handleClick={parseAssembly}
-                                />
-                                <Button
-                                    text="EXECUTE"
-                                    handleClick={parseAssembly}
-                                />
-                                <Button
-                                    text="NEXT"
-                                    handleClick={parseAssembly}
-                                />
-                            </div>
-                        </div>
-                    </div>
+                    <ExecutionController />
                     <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg mb-2 mt-2">
                         <h1 className="bg-primary  text-secondary w-full py-1 text-sm text-center uppercase">
                             CPU REGISTERS
