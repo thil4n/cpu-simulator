@@ -1,4 +1,4 @@
-import { STACK_END, STACK_START } from "@config";
+import { STACK_END, STACK_START, TXT_START } from "@config";
 import { numberToBitArray } from "@utils";
 import { createContext, useContext, useState, ReactNode } from "react";
 
@@ -38,6 +38,7 @@ const RegisterContext = createContext<RegisterContextType | undefined>(
 const initialRegisters: CacheMemory = {
     rbp: numberToBitArray(STACK_START),
     rsp: numberToBitArray(STACK_END),
+    rip: numberToBitArray(TXT_START),
 };
 
 export const RegisterProvider = ({ children }: { children: ReactNode }) => {

@@ -1,66 +1,84 @@
-import { isNumericValue, isRegister, parseImmediate } from "@utils";
-import { operations } from "./operations";
 import { registers } from "./registers";
 
-export const assemble = (parts: string[]) => {
-  const [mnemonic, op1, op2] = parts;
+function rex(w = 1, r = 0, x = 0, b = 0) {
+    return 0x40 | (w << 3) | (r << 2) | (x << 1) | b;
+}
 
-  if (!operations[mnemonic]) {
-    throw new Error(`Unsupported instruction: ${mnemonic}`);
-  }
-  if (!op1) {
-    throw new Error(`Missing operand for instruction: ${mnemonic}`);
-  }
+function encodeModRM(mod: number, reg: number, rm: number) {
+    return (mod << 6) | (reg << 3) | rm;
+}
 
-  // Single operand (e.g., push rax)
-  if (op2 == null) {
-    
-    const regCode = registers[op1].code;
+function toBytesLE(value: number, byteCount: number) {
+    return Array.from(
+        { length: byteCount },
+        (_, i) => (value >> (8 * i)) & 0xff
+    );
+}
 
-    if (regCode === undefined) {
-      throw new Error(`Invalid register: ${op1}`);
-    }
+function encodeMovRegToReg(dst: string | number, src: string | number) {
+    const rexPrefix = rex(1, 0, 0, 0);
+    const opcode = 0x89;
+    const modrm = encodeModRM(0b11, registers[src].code, registers[dst].code);
+    return [rexPrefix, opcode, modrm];
+}
 
-    console.log(regCode);
-    
-    const opcode = operations[mnemonic].code + regCode;
+function encodeMovImmToReg(dst: string | number, imm: string) {
+    const rexPrefix = rex(1, 0, 0, 0);
+    const opcode = 0xb8 + registers[dst].code; // B8 + reg
+    const immBytes = toBytesLE(parseInt(imm), 4);
+    return [rexPrefix, opcode, ...immBytes];
+}
+
+function encodeAddRegToReg(dst: string | number, src: string | number) {
+    const rexPrefix = rex(1, 0, 0, 0);
+    const opcode = 0x01;
+    const modrm = encodeModRM(0b11, registers[src].code, registers[dst].code);
+    return [rexPrefix, opcode, modrm];
+}
+
+function encodeSubRegImm(dst: string | number, imm: string) {
+    const rexPrefix = rex(1, 0, 0, 0);
+    const opcode = 0x81;
+    const modrm = encodeModRM(0b11, 0b101, registers[dst].code); // /5 for sub
+    const immBytes = toBytesLE(parseInt(imm), 4);
+    return [rexPrefix, opcode, modrm, ...immBytes];
+}
+
+function encodeXorRegToReg(dst: string | number, src: string | number) {
+    const rexPrefix = rex(1, 0, 0, 0);
+    const opcode = 0x31;
+    const modrm = encodeModRM(0b11, registers[src].code, registers[dst].code);
+    return [rexPrefix, opcode, modrm];
+}
+
+function encodePushReg(reg) {
+    const opcode = 0x50 + registers[reg].code;
     return [opcode];
-  }
+}
 
-  // If the second operand is a register
-  else if (isRegister(op2)) {
-    const reg1 = registers[op1];
-    const reg2 = registers[op2];
+function encodePopReg(reg) {
+    const opcode = 0x58 + registers[reg].code;
+    return [opcode];
+}
 
-    const opcode = operations[mnemonic].code;
-    const modRM = 0xc0 | (reg2.code << 3) | reg1.code;
-    return [opcode, modRM];
-  }
+export const assemble = ({ operation, operandOne, operandTwo }) => {
+    switch (operation) {
+        case "mov":
+            return operandTwo.startsWith("0x") || /^\d+$/.test(operandTwo)
+                ? encodeMovImmToReg(operandOne, operandTwo)
+                : encodeMovRegToReg(operandOne, operandTwo);
+        case "add":
+            return encodeAddRegToReg(operandOne, operandTwo);
+        case "sub":
+            return encodeSubRegImm(operandOne, operandTwo);
+        case "xor":
+            return encodeXorRegToReg(operandOne, operandTwo);
 
-  // If the second operand is a number
-  else if (isNumericValue(op2)) {
-    // Handle immediate operand (e.g., mov rax, 0x5)
-    const reg = registers[op1];
-    const immValue = parseImmediate(op2);
-    let immBytes = [];
-
-    for (let i = 0; i < 4; i++) {
-      immBytes.push((immValue >> (i * 8)) & 0xff);
+        case "push":
+            return encodePushReg(operandOne.trim());
+        case "pop":
+            return encodePopReg(operandOne.trim());
+        default:
+            throw new Error("Unknown instruction: " + operation);
     }
-
-    if (mnemonic === "mov") {
-        const baseOpcode = operations.mov_imm.code + reg.code;
-        return [baseOpcode, ...immBytes];
-      }
-    
-      if (mnemonic === "add") {
-        const opcode = operations.add_imm.code;
-        const modRM = 0xc0 | (0x0 << 3) | reg.code; // /0 means ADD
-        return [opcode, modRM, ...immBytes];
-      }
-  }
-
-
-
-  throw new Error(`Immediate handling not implemented for ${mnemonic}`);
 };

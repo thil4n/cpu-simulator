@@ -1,63 +1,68 @@
-import { isNumericValue } from "@utils";
-import { operations } from "./operations";
+const REG_LOOKUP = ["rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi"];
 
-function findRegisterCode(regName) {
-    regName = regName.toLowerCase();
-    for (const [name, data] of Object.entries(registers)) {
-      if (name === regName || data.aliases.includes(regName)) {
-        return { reg: name, code: data.code };
-      }
+function readLE(bytes, offset, length) {
+    let val = 0;
+    for (let i = 0; i < length; i++) {
+        val |= bytes[offset + i] << (i * 8);
     }
-    throw new Error(`Unknown register: ${regName}`);
-  }
-  
+    return val;
+}
 
-  
-  function getOpcode(instruction) {
-    const parts = instruction.replace(",", "").trim().split(/\s+/);
-    const [mnemonic, op1, op2] = parts;
-  
-    if (!operations[mnemonic]) {
-      throw new Error(`Unsupported instruction: ${mnemonic}`);
+function decodeModRM(byte) {
+    const mod = (byte & 0b11000000) >> 6;
+    const reg = (byte & 0b00111000) >> 3;
+    const rm = byte & 0b00000111;
+    return { mod, reg, rm };
+}
+
+const disassemble = (bytes) => {
+    let i = 0;
+    const rex = bytes[i++];
+    if ((rex & 0xf0) !== 0x40) throw new Error("Missing REX prefix");
+
+    const opcode = bytes[i++];
+
+    if (opcode === 0x89) {
+        const { reg, rm } = decodeModRM(bytes[i++]);
+        return `mov ${REG_LOOKUP[rm]}, ${REG_LOOKUP[reg]}`;
     }
-  
-    // Single operand (e.g., push rax)
-    if (!op2) {
-      const { code: regCode } = findRegisterCode(op1);
-      const opcode = operations[mnemonic].code + regCode;
-      return [opcode];
+
+    if ((opcode & 0xf8) === 0xb8) {
+        // mov reg, imm
+        const reg = opcode & 0x07;
+        const imm = readLE(bytes, i, 4);
+        return `mov ${REG_LOOKUP[reg]}, ${imm}`;
     }
-  
-    // If the second operand is a register
-    if (!isNumericValue(op2)) {
-      const reg1 = findRegisterCode(op1);
-      const reg2 = findRegisterCode(op2);
-  
-      const opcode = operations[mnemonic].code;
-      const modRM = 0xC0 | (reg2.code << 3) | reg1.code;
-      return [opcode, modRM];
+
+    if (opcode === 0x01) {
+        const { reg, rm } = decodeModRM(bytes[i++]);
+        return `add ${REG_LOOKUP[rm]}, ${REG_LOOKUP[reg]}`;
     }
-  
-    // Handle immediate operand (e.g., mov rax, 0x5)
-    const reg = findRegisterCode(op1);
-    const immValue = parseImmediate(op2);
-    let immBytes = [];
-  
-    for (let i = 0; i < 4; i++) {
-      immBytes.push((immValue >> (i * 8)) & 0xff);
+
+    if (opcode === 0x81) {
+        const { reg, rm } = decodeModRM(bytes[i++]);
+        if (reg === 0b101) {
+            const imm = readLE(bytes, i, 4);
+            return `sub ${REG_LOOKUP[rm]}, ${imm}`;
+        }
     }
-  
-    if (mnemonic === "mov") {
-      const baseOpcode = operations.mov_imm.code + reg.code;
-      return [baseOpcode, ...immBytes];
+
+    if (opcode === 0x31) {
+        const { reg, rm } = decodeModRM(bytes[i++]);
+        return `xor ${REG_LOOKUP[rm]}, ${REG_LOOKUP[reg]}`;
     }
-  
-    if (mnemonic === "add") {
-      const opcode = operations.add_imm.code;
-      const modRM = 0xC0 | (0x0 << 3) | reg.code; // /0 means ADD
-      return [opcode, modRM, ...immBytes];
+
+    // PUSH
+    if ((opcode & 0xf8) === 0x50) {
+        const reg = opcode & 0x07;
+        return `push ${REG_LOOKUP[reg]}`;
     }
-  
-    throw new Error(`Immediate handling not implemented for ${mnemonic}`);
-  }
-  
+
+    // POP
+    if ((opcode & 0xf8) === 0x58) {
+        const reg = opcode & 0x07;
+        return `pop ${REG_LOOKUP[reg]}`;
+    }
+
+    return "unknown";
+};
