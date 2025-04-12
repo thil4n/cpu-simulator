@@ -2,9 +2,13 @@ import { useEffect } from "react";
 import { Button, TextArea, Select } from "@components";
 import { useForm } from "@hooks";
 import { InstructionParserProps, Instruction } from "@interfaces";
-import { parseSingleLine } from "@utils";
+import { bitArrayToNumber, parseHexOpCodes, parseSingleLine } from "@utils";
 import { assemble, samplePrograms } from "@lib";
-import { useMemoryContext } from "@context";
+import {
+    useRegisterContext,
+    useMemoryContext,
+    useLoggerContext,
+} from "@context";
 
 const optList = Object.keys(samplePrograms).map((key) => ({
     id: key,
@@ -12,7 +16,7 @@ const optList = Object.keys(samplePrograms).map((key) => ({
 }));
 
 const InstructionParser: React.FC<InstructionParserProps> = ({
-    setInstructions,
+    handleClose,
 }) => {
     const { formData, handleChange, setFormData } = useForm({
         instructions: "",
@@ -20,15 +24,36 @@ const InstructionParser: React.FC<InstructionParserProps> = ({
     });
 
     const { setMemoryBytes } = useMemoryContext();
+    const { registers } = useRegisterContext();
+    const logger = useLoggerContext();
 
     const parseInstructions = () => {
         const lines = formData.instructions.trim().split("\n").filter(Boolean);
-        const instructions: Instruction[] = lines.map((line: string) => {
-            const instruction = parseSingleLine(line.trim());
+
+        let opcodes: number[] = [];
+
+        logger.info(`Parsing and assembling instructions`);
+
+        lines.forEach((line: string) => {
+            const instruction: Instruction = parseSingleLine(line.trim());
+
             const opcode = assemble(instruction);
-            console.log(opcode);
+
+            const instructionStr = `${instruction.operation} ${
+                instruction.operandOne
+            } ${instruction.operandTwo || ""}`;
+
+            logger.info(
+                `Instruction : ${instructionStr} | Opcode : ${parseHexOpCodes(
+                    opcode
+                )}`
+            );
+
+            opcodes.push(...opcode);
         });
-        setInstructions(instructions);
+
+        setMemoryBytes(bitArrayToNumber(registers.rip), opcodes);
+        handleClose();
     };
 
     useEffect(() => {

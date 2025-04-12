@@ -17,10 +17,17 @@ export const parseAddr = (address: string) => {
     return parseInt(address.substring(2), 16);
 };
 
-
 export const parseImmediate = (value: string) => {
     if (value.startsWith("0x")) {
-      return parseInt(value, 16);
+        return parseInt(value, 16);
     }
     return parseInt(value, 10);
+};
+
+export const parseHexOpCodes = (bytes: any[]) => {
+    return bytes
+        .map((b: { toString: (arg0: number) => string }) =>
+            b.toString(16).padStart(2, "0")
+        )
+        .join(" ");
 };

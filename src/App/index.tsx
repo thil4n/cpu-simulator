@@ -129,8 +129,8 @@ const App = () => {
                     }}
                 >
                     <InstructionParser
-                        setInstructions={(cpuInstructions) => {
-                            setInstructions(cpuInstructions);
+                        handleClose={() => {
+                            logger.info("Program loading completed.");
                             closeModal("instructionModal");
                         }}
                     />
@@ -350,10 +350,14 @@ const App = () => {
                                 />
                                 <Button
                                     text={".TXT"}
-                                    handleClick={function (): void {
-                                        throw new Error(
-                                            "Function not implemented."
+                                    handleClick={() => {
+                                        const rip = bitArrayToNumber(
+                                            registers.rip
                                         );
+
+                                        logger.info("Showing the text segment");
+
+                                        showMemory(rip);
                                     }}
                                 />
                                 <Button

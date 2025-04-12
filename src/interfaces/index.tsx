@@ -1,24 +1,24 @@
 export interface Register {
-  key: string;
-  code: number;
-  desc: string;
+    key: string;
+    code: number;
+    desc: string;
 }
 
 export interface CacheMem {
-  [key: string]: Register;
+    [key: string]: Register;
 }
 
 export interface Instruction {
-  operation: string;
-  operandOne: string | null;
-  operandTwo: string | null;
+    operation: string;
+    operandOne: string | null;
+    operandTwo: string | null;
 }
 
 export interface InstructionParserProps {
-  setInstructions: React.Dispatch<React.SetStateAction<Instruction[]>>;
+    handleClose: () => void;
 }
 
 export interface Memory {
-  index: number;
-  value;
+    index: number;
+    value;
 }
