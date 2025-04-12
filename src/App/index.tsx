@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Cpu } from "lucide-react";
 
 import {
     useLoggerContext,
