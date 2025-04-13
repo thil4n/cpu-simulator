@@ -3,7 +3,7 @@ import {
     useMemoryContext,
     useRegisterContext,
 } from "@context";
-import { bitArrayToNumber, parseSingleLine } from "@utils";
+import { bitArrayToNumber, numberToBitArray, parseSingleLine } from "@utils";
 import { disassemble } from "@lib";
 
 import { Button } from "@components";
@@ -12,7 +12,7 @@ import useInstructions from "../../instructions/useInstructions";
 
 const ExecutionController = () => {
     const { getMemoryBytes } = useMemoryContext();
-    const { registers } = useRegisterContext();
+    const { registers, regset } = useRegisterContext();
     const logger = useLoggerContext();
 
     const { push, mov } = useInstructions();
@@ -22,8 +22,8 @@ const ExecutionController = () => {
 
         logger.info(
             `Parsing the instruction ${operation} with operand one is ${operandOne} ${
-                operandTwo ? " and operand two is " + operandTwo : "."
-            }`
+                operandTwo ? " and operand two is " + operandTwo : ""
+            }.`
         );
 
         switch (operation) {
@@ -50,6 +50,10 @@ const ExecutionController = () => {
         const instructionLine = disassemble(opcode);
 
         execute(instructionLine.instruction);
+
+        rip += instructionLine.length;
+
+        regset("rip", numberToBitArray(rip));
     };
 
     return (
