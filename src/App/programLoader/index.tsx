@@ -6,7 +6,7 @@ import {
 
 import { Button, Modal } from "@components";
 import { useModal } from "@hooks";
-import InstructionParser from "../InstructionParser";
+import InstructionParser from "./InstructionParser";
 
 const ProgramLoader = () => {
     const logger = useLoggerContext();
