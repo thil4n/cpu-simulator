@@ -22,7 +22,6 @@ const InstructionView = () => {
     let fetch = true;
     while (fetch) {
         const opcodes = getMemoryBytes(tempPtr, 10);
-        console.log("opcodes : " + opcodes);
 
         try {
             const { instruction, length } = disassemble(opcodes);
