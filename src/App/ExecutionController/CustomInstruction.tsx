@@ -6,7 +6,7 @@ import { assemble } from "@lib";
 import { useLoggerContext } from "@context";
 
 const CustomInstruction: React.FC<CustomInstructionProps> = ({
-    handleClose,
+    handleExecution,
 }) => {
     const { formData, handleChange } = useForm({
         instruction: "",
@@ -14,14 +14,15 @@ const CustomInstruction: React.FC<CustomInstructionProps> = ({
 
     const logger = useLoggerContext();
 
-    const parseInstructions = (line: string) => {
-        const instruction: Instruction = parseSingleLine(line.trim());
+    const executeInstruction = () => {
+        const line = formData.instruction.trim();
+        const instruction: Instruction = parseSingleLine(line);
 
         const opcode = assemble(instruction);
 
         const instructionStr = `${instruction.operation} ${
             instruction.operandOne
-        } ${instruction.operandTwo || ""}`;
+        }, ${instruction.operandTwo || ""}`;
 
         logger.info(
             `Instruction : ${instructionStr} | Opcode : ${parseHexOpCodes(
@@ -29,22 +30,22 @@ const CustomInstruction: React.FC<CustomInstructionProps> = ({
             )}`
         );
 
-        handleClose();
+        handleExecution(line);
     };
 
     return (
         <div className="flex flex-col gap-4 w-full">
             <Input
-                name="instructions"
+                name="instruction"
                 handleChange={handleChange}
-                value={formData.instructions}
+                value={formData.instruction}
                 rows={10}
                 inputClassName="p-4 text-secondary"
             />
 
             <Button
-                text="Parse Instructions"
-                handleClick={parseInstructions}
+                text="Execute"
+                handleClick={executeInstruction}
                 className="w-full"
             />
         </div>

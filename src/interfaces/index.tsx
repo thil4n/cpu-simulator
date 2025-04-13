@@ -17,8 +17,10 @@ export interface Instruction {
 export interface InstructionParserProps {
     handleClose: () => void;
 }
+export interface CustomInstructionProps {
+    handleExecution: (instruction: string) => void;
+}
 
 export interface Memory {
     index: number;
-    value;
 }
