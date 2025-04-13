@@ -1,14 +1,8 @@
 import { useState, useEffect } from "react";
 
-import {
-    useLoggerContext,
-    useMemoryContext,
-    useRegisterContext,
-} from "@context";
-import { Button, Loader, Mobile, Modal, NavBar } from "@components";
+import { useLoggerContext, useMemoryContext } from "@context";
+import { Loader, Mobile, Modal, NavBar } from "@components";
 import { useModal, useScreen } from "@hooks";
-import { adgp_registers, gp_registers } from "@lib";
-import { bitArrayToNumber } from "@utils";
 
 import Console from "./Console";
 import MemoryView from "./MemoryView";
@@ -17,7 +11,8 @@ import MemoryBar from "./MemoryBar";
 import InstructionView from "./InstructionView";
 import ExecutionController from "./ExecutionController";
 import ProgramLoader from "./programLoader";
-import MemoryPlane from "./MemoryPlane";
+import MemoryPanel from "./MemoryPanel";
+import RegisterPanel from "./RegisterPanel";
 
 interface ExamineMemory {
     startAddress: number;
@@ -40,7 +35,6 @@ const App = () => {
 
     const logger = useLoggerContext();
     const { memory } = useMemoryContext();
-    const { registers } = useRegisterContext();
 
     const showMemory = (startAddr: number) => {
         const endAddr = startAddr + 200;
@@ -120,55 +114,8 @@ const App = () => {
                 <div className="w-full col-span-3 mt-4">
                     <ProgramLoader />
                     <ExecutionController />
-                    <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg mb-2 mt-2">
-                        <h1 className="bg-primary  text-secondary w-full py-1 text-sm text-center uppercase">
-                            CPU Registers
-                        </h1>
-                        <div className="grid grid-cols-3 gap-1 mt-3 px-2">
-                            <div>
-                                {gp_registers.map((register) => {
-                                    return (
-                                        <Button
-                                            key={register}
-                                            text={register}
-                                            handleClick={() => {
-                                                handleClickRegister(register);
-                                            }}
-                                        />
-                                    );
-                                })}
-                            </div>
-                            <div>
-                                {adgp_registers.map((register) => {
-                                    return (
-                                        <Button
-                                            key={register}
-                                            text={register}
-                                            handleClick={() => {
-                                                handleClickRegister(register);
-                                            }}
-                                        />
-                                    );
-                                })}
-                            </div>
-                            <div>
-                                <Button
-                                    text={"RIP"}
-                                    handleClick={() => {
-                                        handleClickRegister("rip");
-                                    }}
-                                />
-                                <Button
-                                    text={"RFLAGS"}
-                                    handleClick={() => {
-                                        handleClickRegister("rflags");
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <MemoryPlane showMemory={showMemory} />
+                    <RegisterPanel handleClickRegister={handleClickRegister} />
+                    <MemoryPanel showMemory={showMemory} />
                 </div>
             </div>
 

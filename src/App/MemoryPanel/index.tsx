@@ -2,7 +2,7 @@ import { Button } from "@components";
 import { useLoggerContext, useRegisterContext } from "@context";
 import { bitArrayToNumber } from "@utils";
 
-const MemoryPlane = ({ showMemory }) => {
+const MemoryPanel = ({ showMemory }) => {
     const { registers } = useRegisterContext();
     const logger = useLoggerContext();
 
@@ -63,4 +63,4 @@ const MemoryPlane = ({ showMemory }) => {
     );
 };
 
-export default MemoryPlane;
+export default MemoryPanel;
