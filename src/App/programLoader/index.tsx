@@ -1,4 +1,8 @@
-import { useLoggerContext, useMemoryContext } from "@context";
+import {
+    useLoggerContext,
+    useMemoryContext,
+    useRegisterContext,
+} from "@context";
 
 import { Button, Modal } from "@components";
 import { useModal } from "@hooks";
@@ -7,6 +11,7 @@ import InstructionParser from "../InstructionParser";
 const ProgramLoader = () => {
     const logger = useLoggerContext();
     const { clearMemory } = useMemoryContext();
+    const { clearRegisters } = useRegisterContext();
 
     const { modalStatus, openModal, closeModal } = useModal();
 
@@ -47,6 +52,9 @@ const ProgramLoader = () => {
                             handleClick={() => {
                                 clearMemory();
                                 logger.info("Clearing the memory.");
+
+                                clearRegisters();
+                                logger.info("Clearing the registers.");
 
                                 logger.info(
                                     "Pointing the RIP to the start of text section."
