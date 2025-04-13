@@ -17,7 +17,7 @@ const ExecutionController = () => {
     const { registers, regset } = useRegisterContext();
     const logger = useLoggerContext();
 
-    const { push, mov } = useInstructions();
+    const { push, pop, mov } = useInstructions();
 
     const { modalStatus, openModal, closeModal } = useModal();
 
@@ -39,6 +39,10 @@ const ExecutionController = () => {
 
             case "push":
                 push(operandOne);
+                break;
+
+            case "pop":
+                pop(operandOne);
                 break;
 
             default:
