@@ -38,7 +38,7 @@ module.exports = {
                 64: "span 64",
             },
             animation: {
-                "cpu-spin": "spin 2s linear infinite",
+                "cpu-spin": "spin 3s linear infinite",
             },
         },
     },

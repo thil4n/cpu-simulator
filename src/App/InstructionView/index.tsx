@@ -65,7 +65,7 @@ const InstructionView = () => {
                     <div className="w-full flex flex-col justify-center items-center">
                         <Cpu
                             size={64}
-                            className="text-7xl text-secondary mb-4"
+                            className="text-7xl text-secondary mb-4 animate-cpu-spin"
                         />
                         <h1 className="text-secondary text-sm">
                             No instructions loaded. Click on Load Program to
