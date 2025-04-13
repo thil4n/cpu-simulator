@@ -21,7 +21,7 @@ const InstructionView = () => {
 
     let fetch = true;
     while (fetch) {
-        const opcodes = getMemoryBytes(rip, 10);
+        const opcodes = getMemoryBytes(tempPtr, 10);
         console.log("opcodes : " + opcodes);
 
         try {
