@@ -179,7 +179,7 @@ const App = () => {
                                             registers.rsp
                                         );
 
-                                        logger.info("Showing the stack area");
+                                        logger.info("Showing the stack area.");
 
                                         showMemory(rsp);
                                     }}
@@ -207,7 +207,9 @@ const App = () => {
                                             registers.rip
                                         );
 
-                                        logger.info("Showing the text segment");
+                                        logger.info(
+                                            "Showing the text segment."
+                                        );
 
                                         showMemory(rip);
                                     }}
