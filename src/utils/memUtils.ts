@@ -43,7 +43,7 @@ export const bitsToBytes = (bitArray: number[]): number[] => {
     return bytes;
 };
 
-export const BytesToBits = (byteArray: number[]): number[] => {
+export const bytesToBits = (byteArray: number[]): number[] => {
     const bitArray: number[] = [];
 
     byteArray.forEach((byte) => {

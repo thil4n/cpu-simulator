@@ -7,7 +7,7 @@ import {
     isRegister,
     isNumericValue,
     numberToLittleEndianBytes,
-    BytesToBits,
+    bytesToBits,
     isMemoryAddress,
     bitsToBytes,
     littleEndianBytesToNumber,
@@ -32,7 +32,7 @@ const useMov = () => {
         else if (isNumericValue(src) && isRegister(dest)) {
             const srcBytes = numberToLittleEndianBytes(src);
 
-            regset(dest, BytesToBits(srcBytes));
+            regset(dest, bytesToBits(srcBytes));
             info(`Moving immediate value ${src} into register ${dest}.`);
         }
 
@@ -50,7 +50,7 @@ const useMov = () => {
         // mem to reg
         else if (isMemoryAddress(src) && isRegister(dest)) {
             const srcBytes = getMemoryBytes(src, 8);
-            regset(dest, BytesToBits(srcBytes));
+            regset(dest, bytesToBits(srcBytes));
             const value = littleEndianBytesToNumber(srcBytes);
 
             info(`Moving ${value} from ${src} to memory address ${dest}.`);
