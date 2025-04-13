@@ -22,7 +22,7 @@ const Modal: React.FC<ModalProps> = ({
                     <div className="w-full bg-primary text-secondary text-md mb-6 flex items-center justify-between">
                         <h3 className="mx-auto py-1">{title}</h3>
                         <span
-                            className="bg-slate-500 hover:bg-secondary px-3 py-1 cursor-pointer"
+                            className="bg-slate-400 hover:bg-secondary hover:text-white px-3 py-1 cursor-pointer"
                             onClick={handleClose}
                         >
                             X
