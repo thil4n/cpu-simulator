@@ -2,6 +2,7 @@ import { useMemoryContext, useRegisterContext } from "@context";
 import { bitArrayToNumber, parseSingleLine } from "@utils";
 import { disassemble } from "@lib";
 import { Cpu } from "lucide-react";
+import { TXT_START } from "@config";
 
 interface instructionLine {
     instruction: string;
@@ -12,8 +13,9 @@ const InstructionView = () => {
     const { getMemoryBytes } = useMemoryContext();
     const { registers } = useRegisterContext();
 
-    let rip = bitArrayToNumber(registers.rip);
-    const originalRip = rip;
+    const rip = bitArrayToNumber(registers.rip);
+
+    let tempPtr = TXT_START;
 
     const instructions: instructionLine[] = [];
 
@@ -25,9 +27,9 @@ const InstructionView = () => {
         try {
             const { instruction, length } = disassemble(opcodes);
 
-            instructions.push({ instruction, isCurrent: rip == originalRip });
+            instructions.push({ instruction, isCurrent: tempPtr == rip });
 
-            rip += length;
+            tempPtr += length;
         } catch (error) {
             fetch = false;
         }
