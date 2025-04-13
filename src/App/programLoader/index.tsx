@@ -1,59 +1,13 @@
-import {
-    useLoggerContext,
-    useMemoryContext,
-    useRegisterContext,
-} from "@context";
-import { bitArrayToNumber, parseSingleLine } from "@utils";
-import { disassemble } from "@lib";
+import { useLoggerContext } from "@context";
 
-import { Button, Input, Modal } from "@components";
-import { useModal, useForm } from "@hooks";
+import { Button, Modal } from "@components";
+import { useModal } from "@hooks";
 import InstructionParser from "../InstructionParser";
-import useInstructions from "../../instructions/useInstructions";
 
 const ProgramLoader = () => {
-    const { getMemoryBytes } = useMemoryContext();
-    const { registers } = useRegisterContext();
     const logger = useLoggerContext();
 
-    let rip = bitArrayToNumber(registers.rip);
-
     const { modalStatus, openModal, closeModal } = useModal();
-
-    const { formData, handleChange } = useForm({
-        assemblyInput: "",
-    });
-
-    const { push, mov } = useInstructions();
-
-    const parseAssembly = () => {
-        const instruction = formData.assemblyInput;
-
-        const { operation, operandOne, operandTwo } =
-            parseSingleLine(instruction);
-
-        logger.info(
-            `Parsing the instruction ${operation} with operand one is ${operandOne} ${
-                operandTwo ? " and operand two is " + operandTwo : "."
-            }`
-        );
-
-        switch (operation) {
-            case "mov":
-                const src = operandTwo;
-                const dest = operandOne;
-                mov(src, dest);
-                break;
-
-            case "push":
-                push(operandOne);
-                break;
-
-            default:
-                logger.error("Invalid operation given.");
-                break;
-        }
-    };
 
     return (
         <div>
@@ -88,9 +42,11 @@ const ProgramLoader = () => {
                         />
                         <Button
                             className="-mt-1"
-                            text="Clear"
+                            text="Reset"
                             handleClick={() => {
-                                logger.info("Cleared the instructions.");
+                                logger.info(
+                                    "Reset the RIP to .txt starting point"
+                                );
                             }}
                         />
                     </div>
