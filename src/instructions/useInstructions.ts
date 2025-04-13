@@ -27,7 +27,7 @@ const useInstructions = () => {
     return {
         push,
         pop,
-        mov /*pop,add, sub, mul, div, cmp, jmp, call, ret, and, or, xor, not, inc, dec */,
+        mov /*,add, sub, mul, div, cmp, jmp, call, ret, and, or, xor, not, inc, dec */,
     };
 };
 export default useInstructions;
