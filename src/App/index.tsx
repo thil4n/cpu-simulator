@@ -12,7 +12,6 @@ import { bitArrayToNumber } from "@utils";
 
 import Console from "./Console";
 import MemoryView from "./MemoryView";
-
 import RegisterView from "./RegisterView";
 import MemoryBar from "./MemoryBar";
 import InstructionView from "./InstructionView";
