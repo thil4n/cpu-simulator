@@ -16,6 +16,7 @@ import RegisterView from "./RegisterView";
 import MemoryBar from "./MemoryBar";
 import InstructionView from "./InstructionView";
 import ExecutionController from "./ExecutionController";
+import ProgramLoader from "./programLoader";
 
 interface ExamineMemory {
     startAddress: number;
@@ -105,7 +106,7 @@ const App = () => {
                     }}
                     memoryRange={memoryRange}
                 />
-                <div className="relative min-h-screen flex flex-col col-span-7 w-full mt-4">
+                <div className="relative min-h-screen flex flex-col col-span-7 w-full mt-3">
                     <div className="w-full col-span-5">
                         <InstructionView />
                     </div>
@@ -115,17 +116,19 @@ const App = () => {
                     </div>
                 </div>
 
-                <div className="w-full col-span-3 mt-4">
+                <div className="w-full col-span-3 mt-3">
+                    <ProgramLoader />
                     <ExecutionController />
                     <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg mb-2 mt-2">
                         <h1 className="bg-primary  text-secondary w-full py-1 text-sm text-center uppercase">
-                            CPU REGISTERS
+                            CPU Registers
                         </h1>
                         <div className="grid grid-cols-3 gap-1 mt-3 px-2">
                             <div>
                                 {gp_registers.map((register) => {
                                     return (
                                         <Button
+                                            className="-mt-1"
                                             key={register}
                                             text={register}
                                             handleClick={() => {
@@ -139,6 +142,7 @@ const App = () => {
                                 {adgp_registers.map((register) => {
                                     return (
                                         <Button
+                                            className="-mt-1"
                                             key={register}
                                             text={register}
                                             handleClick={() => {
@@ -150,12 +154,14 @@ const App = () => {
                             </div>
                             <div>
                                 <Button
+                                    className="-mt-1"
                                     text={"RIP"}
                                     handleClick={() => {
                                         handleClickRegister("rip");
                                     }}
                                 />
                                 <Button
+                                    className="-mt-1"
                                     text={"RFLAGS"}
                                     handleClick={() => {
                                         handleClickRegister("rflags");
@@ -171,6 +177,7 @@ const App = () => {
                         <div className="px-2 py2 mt-3">
                             <div className="grid grid-cols-3 gap-x-1">
                                 <Button
+                                    className="-mt-1"
                                     text={"Stack"}
                                     handleClick={() => {
                                         const rsp = bitArrayToNumber(
@@ -183,6 +190,7 @@ const App = () => {
                                     }}
                                 />
                                 <Button
+                                    className="-mt-1"
                                     text={"Heap"}
                                     handleClick={function (): void {
                                         throw new Error(
@@ -191,6 +199,7 @@ const App = () => {
                                     }}
                                 />
                                 <Button
+                                    className="-mt-1"
                                     text={".BSS"}
                                     handleClick={function (): void {
                                         throw new Error(
@@ -199,6 +208,7 @@ const App = () => {
                                     }}
                                 />
                                 <Button
+                                    className="-mt-1"
                                     text={".TXT"}
                                     handleClick={() => {
                                         const rip = bitArrayToNumber(
@@ -211,6 +221,7 @@ const App = () => {
                                     }}
                                 />
                                 <Button
+                                    className="-mt-1"
                                     text={".DATA"}
                                     handleClick={function (): void {
                                         throw new Error(
@@ -219,6 +230,7 @@ const App = () => {
                                     }}
                                 />
                                 <Button
+                                    className="-mt-1"
                                     text={"Address"}
                                     handleClick={function (): void {
                                         throw new Error(
