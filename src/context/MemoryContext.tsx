@@ -10,6 +10,7 @@ interface MemoryContextType {
     setMemoryBytes: (address: number, bytes: number[]) => void;
     getMemoryByte: (address: number) => number;
     getMemoryBytes: (address: number, length: number) => number[];
+    clearMemory: () => void;
 }
 
 const MemoryContext = createContext<MemoryContextType | undefined>(undefined);
@@ -33,8 +34,6 @@ export const MemoryProvider = ({ children }: { children: ReactNode }) => {
             });
             return updated;
         });
-
-        console.log(memory);
     };
 
     const getMemoryByte = (address: number): number => {
@@ -46,6 +45,10 @@ export const MemoryProvider = ({ children }: { children: ReactNode }) => {
         return Array.from({ length }, (_, i) => getMemoryByte(address + i));
     };
 
+    const clearMemory = () => {
+        setMemory({});
+    };
+
     return (
         <MemoryContext.Provider
             value={{
@@ -54,6 +57,7 @@ export const MemoryProvider = ({ children }: { children: ReactNode }) => {
                 setMemoryBytes,
                 getMemoryByte,
                 getMemoryBytes,
+                clearMemory,
             }}
         >
             {children}
