@@ -1,4 +1,4 @@
-import { useLoggerContext } from "@context";
+import { useLoggerContext, useMemoryContext } from "@context";
 
 import { Button, Modal } from "@components";
 import { useModal } from "@hooks";
@@ -6,6 +6,7 @@ import InstructionParser from "../InstructionParser";
 
 const ProgramLoader = () => {
     const logger = useLoggerContext();
+    const { clearMemory } = useMemoryContext();
 
     const { modalStatus, openModal, closeModal } = useModal();
 
@@ -44,8 +45,11 @@ const ProgramLoader = () => {
                             className="-mt-1"
                             text="Reset"
                             handleClick={() => {
+                                clearMemory();
+                                logger.info("Clearing the memory.");
+
                                 logger.info(
-                                    "Reset the RIP to .txt starting point"
+                                    "Pointing the RIP to the start of text section."
                                 );
                             }}
                         />

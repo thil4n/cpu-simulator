@@ -29,6 +29,7 @@ type Register =
 interface RegisterContextType {
     registers: CacheMemory;
     regset: (key: Register, bitArray: number[]) => void;
+    clearRegisters: () => void;
 }
 
 const RegisterContext = createContext<RegisterContextType | undefined>(
@@ -51,11 +52,16 @@ export const RegisterProvider = ({ children }: { children: ReactNode }) => {
         }));
     };
 
+    const clearRegisters = () => {
+        setRegisters(initialRegisters);
+    };
+
     return (
         <RegisterContext.Provider
             value={{
                 registers,
                 regset,
+                clearRegisters,
             }}
         >
             {children}
