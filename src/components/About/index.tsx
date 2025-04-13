@@ -38,7 +38,7 @@ const About = () => {
                     Contact :{" "}
                     <a
                         className="underline hover:text-white"
-                        href="youtube.com"
+                        href="mailto:thilan@wso2.com"
                     >
                         thilan@wso2.com
                     </a>

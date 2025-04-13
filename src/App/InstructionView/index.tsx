@@ -67,7 +67,7 @@ const InstructionView = () => {
                             size={64}
                             className="text-7xl text-secondary mb-4 animate-cpu-spin"
                         />
-                        <h1 className="text-secondary text-sm">
+                        <h1 className="text-secondary text-md">
                             No instructions loaded. Click on Load Program to
                             load instructions.
                         </h1>
