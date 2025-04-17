@@ -32,4 +32,7 @@ jobs:
         run: |
           echo "$KEY" > private_key.pem
           chmod 600 private_key.pem
-          scp -i private_key.pem -r dist/* $USER@$HOST:/var/www/html/cpusimulator
+          scp -i private_key.pem \
+              -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              -r dist/* $USER@$HOST:/var/www/html/cpusimulator
