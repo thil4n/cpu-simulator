@@ -10,7 +10,13 @@ CPU Simulator is a project implemented in TypeScript, designed to simulate the f
 - Support for custom instruction sets.
 - Visualization of CPU state and operation flow.
 
-## Getting Started
+## Try it out (Beta version)
+
+You may try out the live version via the following URL.
+
+[https://cpusimulator.org](https://cpusimulator.org)
+
+## Build locally
 
 ### Prerequisites
 
@@ -20,30 +26,30 @@ CPU Simulator is a project implemented in TypeScript, designed to simulate the f
 ### Installation
 
 1. Clone the repository:
+
     ```bash
-    git clone https://github.com/thil4n/cpu-simulator.git
+        git clone https://github.com/thil4n/cpu-simulator.git
     ```
 
 2. Navigate to the project directory:
+
     ```bash
-    cd cpu-simulator
+        cd cpu-simulator
     ```
 
 3. Install the dependencies:
+
     ```bash
-    npm install
+        npm install
     ```
 
 ### Running the Simulator
 
 To start the CPU simulator, run:
+
 ```bash
-npm start
+npm run dev
 ```
-
-## Usage
-
-Explain how to use the CPU simulator here. Include examples and screenshots if necessary.
 
 ## Contributing
 
