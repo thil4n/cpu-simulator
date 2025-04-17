@@ -20,7 +20,7 @@ const About = () => {
                     Intro video :{" "}
                     <a
                         className="underline hover:text-white"
-                        href="youtube.com"
+                        href="https://youtu.be/n4AspKF4rKM"
                     >
                         Watch here
                     </a>
@@ -29,7 +29,7 @@ const About = () => {
                     Research paper :{" "}
                     <a
                         className="underline hover:text-white"
-                        href="youtube.com"
+                        href="https://youtu.be/n4AspKF4rKM"
                     >
                         Read here
                     </a>
