@@ -21,6 +21,9 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Create .env file
+        run: echo "${{ secrets.REACT_ENV_FILE }}" > .env
+
       - name: Build React App
         run: npm run build
 
