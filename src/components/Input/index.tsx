@@ -35,7 +35,7 @@ const Input: React.FC<InputProps> = ({
     inputClassName = "",
     labelClassName = "",
 }) => {
-    const [showPassword, setShowPassword] = useState(false); // eslint-disable-line @typescript-eslint/no-unused-vars
+    const [showPassword, _setShowPassword] = useState(false);
 
     const inputClasses = (): string => {
         let classes =

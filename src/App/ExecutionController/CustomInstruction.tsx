@@ -1,4 +1,4 @@
-import { Button, Input } from "@components";
+import { Button, TextArea } from "@components";
 import { useForm } from "@hooks";
 import { CustomInstructionProps, Instruction } from "@interfaces";
 import { parseHexOpCodes, parseSingleLine } from "@utils";
@@ -35,7 +35,7 @@ const CustomInstruction: React.FC<CustomInstructionProps> = ({
 
     return (
         <div className="flex flex-col gap-4 w-full">
-            <Input
+            <TextArea
                 name="instruction"
                 handleChange={handleChange}
                 value={formData.instruction}

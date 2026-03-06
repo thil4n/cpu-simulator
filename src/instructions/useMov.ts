@@ -24,15 +24,15 @@ const useMov = () => {
         // register to register
         if (isRegister(src) && isRegister(dest)) {
             const srcBits = registers[src] ?? Array(64).fill(0);
-            regset(dest, srcBits);
+            regset(dest as any, srcBits);
             info(`Moving value from register ${src} to register ${dest}.`);
         }
 
         // immediate to reg
         else if (isNumericValue(src) && isRegister(dest)) {
-            const srcBytes = numberToLittleEndianBytes(src);
+            const srcBytes = numberToLittleEndianBytes(parseInt(src, 10));
 
-            regset(dest, bytesToBits(srcBytes));
+            regset(dest as any, bytesToBits(srcBytes));
             info(`Moving immediate value ${src} into register ${dest}.`);
         }
 
@@ -42,32 +42,30 @@ const useMov = () => {
             const srcBytes = bitsToBytes(srcBits);
             const value = littleEndianBytesToNumber(srcBytes);
 
-            setMemoryBytes(dest, srcBytes);
+            setMemoryBytes(parseAddr(dest), srcBytes);
 
             info(`Moving ${value} from ${src} to memory address ${dest}.`);
         }
 
         // mem to reg
         else if (isMemoryAddress(src) && isRegister(dest)) {
-            const srcBytes = getMemoryBytes(src, 8);
-            regset(dest, bytesToBits(srcBytes));
+            const srcBytes = getMemoryBytes(parseAddr(src), 8);
+            regset(dest as any, bytesToBits(srcBytes));
             const value = littleEndianBytesToNumber(srcBytes);
 
-            info(`Moving ${value} from ${src} to memory address ${dest}.`);
+            info(`Moving ${value} from ${src} to register ${dest}.`);
         }
 
         // immediate to mem
         else if (isNumericValue(src) && isMemoryAddress(dest)) {
-            const srcBytes = numberToLittleEndianBytes(src);
+            const srcBytes = numberToLittleEndianBytes(parseInt(src, 10));
             const value = littleEndianBytesToNumber(srcBytes);
 
             const address = parseAddr(dest);
 
-            console.log(address);
-
             setMemoryBytes(address, srcBytes);
 
-            info(`Moving ${value}  to memory address ${dest}.`);
+            info(`Moving ${value} to memory address ${dest}.`);
         } else {
             error("Invalid operands given.");
         }

@@ -35,7 +35,7 @@ const App = () => {
     const isDesktop = useScreen();
 
     const logger = useLoggerContext();
-    const { memory } = useMemoryContext();
+    useMemoryContext(); // Keep context subscription for reactivity
 
     const showMemory = (startAddr: number) => {
         const endAddr = startAddr + 200;
@@ -85,7 +85,6 @@ const App = () => {
                     <MemoryView
                         startAddress={examineMemory?.startAddress}
                         wordCount={examineMemory?.wordCount}
-                        memory={memory}
                     />
                 </Modal>
             )}

@@ -1,6 +1,6 @@
 import { About, Modal } from "@components";
 import { useModal } from "@hooks";
-import { GitFork, Heart, Cpu, Info, Lightbulb } from "lucide-react";
+import { GitFork, Heart, Cpu, Lightbulb } from "lucide-react";
 
 const NavBar = () => {
     const baseUrl = import.meta.env.VITE_BASE_URL;

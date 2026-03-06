@@ -27,7 +27,7 @@ const useAdd = () => {
                 `Adding value of ${source} (${srcVal}) to ${dest} (${destVal})`
             );
         } else if (isNumericValue(source)) {
-            srcVal = source;
+            srcVal = parseInt(source, 10);
             info(`Adding immediate value ${srcVal} to ${dest} (${destVal})`);
         } else {
             error("Source must be a register or an immediate number.");
@@ -36,7 +36,7 @@ const useAdd = () => {
 
         const result = destVal + srcVal;
         const resultBits = numberToBitArray(result);
-        regset(dest, resultBits);
+        regset(dest as any, resultBits);
 
         info(`${dest} updated to ${result}`);
     };

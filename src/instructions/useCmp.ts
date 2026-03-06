@@ -21,7 +21,7 @@ const useCmp = () => {
             const bits2 = registers[op2] ?? Array(64).fill(0);
             val2 = bitArrayToNumber(bits2);
         } else if (isNumericValue(op2)) {
-            val2 = op2;
+            val2 = parseInt(op2, 10);
         } else {
             error("Second operand must be a register or immediate value.");
             return;

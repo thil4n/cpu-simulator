@@ -26,7 +26,7 @@ const usePush = () => {
 
             info(`Pushing the value of ${operand} register onto the stack.`);
         } else if (isNumericValue(operand)) {
-            byteArray = numberToLittleEndianBytes(operand);
+            byteArray = numberToLittleEndianBytes(parseInt(operand, 10));
             info(`Pushing the value: ${operand} onto the stack.`);
         } else {
             error("Invalid operand given for the push operation.");

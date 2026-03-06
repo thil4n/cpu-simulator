@@ -32,34 +32,31 @@ const ExecutionController = () => {
 
         switch (operation) {
             case "mov":
-                const src = operandTwo;
-                const dest = operandOne;
-                mov(src, dest);
+                mov(operandTwo ?? "", operandOne ?? "");
                 break;
 
             case "push":
-                push(operandOne);
+                push(operandOne ?? "");
                 break;
 
             case "pop":
-                pop(operandOne);
+                pop(operandOne ?? "");
                 break;
 
             case "add":
-                add(operandOne, operandTwo);
+                add(operandOne ?? "", operandTwo ?? "");
                 break;
 
             case "sub":
-                sub(operandOne, operandTwo);
+                sub(operandOne ?? "", operandTwo ?? "");
                 break;
 
             case "xor":
-                // Reuse sub logic pattern — XOR on registers
                 if (operandOne && operandTwo) {
                     const destBits = registers[operandOne] ?? Array(64).fill(0);
                     const srcBits = registers[operandTwo] ?? Array(64).fill(0);
                     const resultBits = destBits.map((bit: number, i: number) => bit ^ srcBits[i]);
-                    regset(operandOne, resultBits);
+                    regset(operandOne as any, resultBits);
                     logger.info(`XOR ${operandOne}, ${operandTwo}`);
                 } else {
                     logger.error("XOR requires two register operands.");
@@ -67,7 +64,7 @@ const ExecutionController = () => {
                 break;
 
             case "cmp":
-                cmp(operandOne, operandTwo);
+                cmp(operandOne ?? "", operandTwo ?? "");
                 break;
 
             default:

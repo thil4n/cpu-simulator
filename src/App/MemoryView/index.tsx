@@ -9,7 +9,7 @@ interface Cell {
   value: number;
 }
 
-const MemoryView = ({ startAddress, wordCount = 24, memory }: { startAddress: number; wordCount?: number; memory?: any }) => {
+const MemoryView = ({ startAddress, wordCount = 24 }: { startAddress: number; wordCount?: number }) => {
   const { getMemoryBytes } = useMemoryContext();
 
   const { formData, handleChange } = useForm({
@@ -72,7 +72,7 @@ const MemoryView = ({ startAddress, wordCount = 24, memory }: { startAddress: nu
     buildMemoryView();
   }, [formData]);
 
-  const handleHover = ({ address, value }) => {
+  const handleHover = ({ address, value }: { address: number; value: number }) => {
     setStatus(`Memory cell at ${address} with the value ${value}`);
   };
 
@@ -183,6 +183,7 @@ const MemoryView = ({ startAddress, wordCount = 24, memory }: { startAddress: nu
           : "col-span-1"
       }
       hover:bg-secondary hover:text-white`}
+            onClick={() => handleCellClick(memoryCell.address)}
             onMouseEnter={() => {
               handleHover(memoryCell);
             }}

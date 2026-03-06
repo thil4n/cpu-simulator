@@ -31,7 +31,7 @@ const usePop = () => {
         }
 
         const valueBits = bytesToBits(byteArray);
-        regset(operand, valueBits);
+        regset(operand as any, valueBits);
         info(`Popped value into register ${operand}.`);
 
         const newRspValue = rspValue + 8;

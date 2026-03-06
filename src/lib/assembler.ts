@@ -63,23 +63,25 @@ function encodePopReg(reg: string | number) {
     return [rexPrefix, opcode];
 }
 
-export const assemble = ({ operation, operandOne, operandTwo }) => {
+export const assemble = ({ operation, operandOne, operandTwo }: { operation: string; operandOne: string | null; operandTwo: string | null }) => {
+    const op1 = operandOne?.trim() ?? "";
+    const op2 = operandTwo?.trim() ?? "";
     switch (operation) {
         case "mov":
-            return operandTwo.startsWith("0x") || /^\d+$/.test(operandTwo)
-                ? encodeMovImmToReg(operandOne, operandTwo)
-                : encodeMovRegToReg(operandOne, operandTwo);
+            return op2.startsWith("0x") || /^\d+$/.test(op2)
+                ? encodeMovImmToReg(op1, op2)
+                : encodeMovRegToReg(op1, op2);
         case "add":
-            return encodeAddRegToReg(operandOne, operandTwo);
+            return encodeAddRegToReg(op1, op2);
         case "sub":
-            return encodeSubRegImm(operandOne, operandTwo);
+            return encodeSubRegImm(op1, op2);
         case "xor":
-            return encodeXorRegToReg(operandOne, operandTwo);
+            return encodeXorRegToReg(op1, op2);
 
         case "push":
-            return encodePushReg(operandOne.trim());
+            return encodePushReg(op1);
         case "pop":
-            return encodePopReg(operandOne.trim());
+            return encodePopReg(op1);
         default:
             throw new Error("Unknown instruction: " + operation);
     }
