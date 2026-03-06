@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useLoggerContext, useMemoryContext } from "@context";
 import { Loader, Mobile, Modal, NavBar } from "@components";
 import { useModal, useScreen } from "@hooks";
+import { TXT_START } from "@config";
 
 import Console from "./Console";
 import MemoryView from "./MemoryView";
@@ -51,7 +52,7 @@ const App = () => {
     };
 
     useEffect(() => {
-        showMemory(1000);
+        showMemory(TXT_START);
     }, []);
 
     const loadingEnabled = import.meta.env.VITE_SHOW_LOADING == "true";

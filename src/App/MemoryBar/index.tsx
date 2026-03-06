@@ -1,6 +1,11 @@
 import MemoryCell from "./MemoryCell";
 
-const MemoryBar = ({ memoryRange, handleExamineMemory }) => {
+interface MemoryBarProps {
+    memoryRange: number[];
+    handleExamineMemory: (address: number) => void;
+}
+
+const MemoryBar = ({ memoryRange, handleExamineMemory }: MemoryBarProps) => {
     return (
         <div
             className="h-screen  overflow-y-auto w-full col-span-2 "

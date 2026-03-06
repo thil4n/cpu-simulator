@@ -17,12 +17,20 @@ const LoggerContext = createContext<LoggerContextType | undefined>(undefined);
 export const LoggerProvider = ({ children }: { children: ReactNode }) => {
     const [logs, setLogs] = useState<Log[]>([]);
 
+    const MAX_LOGS = 500;
+
     const info = (message: string) => {
-        setLogs((prevLogs) => [...prevLogs, { type: "info", message }]);
+        setLogs((prevLogs) => {
+            const newLogs = [...prevLogs, { type: "info" as const, message }];
+            return newLogs.length > MAX_LOGS ? newLogs.slice(-MAX_LOGS) : newLogs;
+        });
     };
 
     const error = (message: string) => {
-        setLogs((prevLogs) => [...prevLogs, { type: "error", message }]);
+        setLogs((prevLogs) => {
+            const newLogs = [...prevLogs, { type: "error" as const, message }];
+            return newLogs.length > MAX_LOGS ? newLogs.slice(-MAX_LOGS) : newLogs;
+        });
     };
 
     const clear = () => {

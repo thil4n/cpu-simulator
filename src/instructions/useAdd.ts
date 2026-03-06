@@ -10,7 +10,7 @@ const useAdd = () => {
     const { info, error } = useLoggerContext();
     const { registers, regset } = useRegisterContext();
 
-    const add = (dest: any, source: any) => {
+    const add = (dest: string, source: string) => {
         if (!isRegister(dest)) {
             error("Destination must be a register.");
             return;

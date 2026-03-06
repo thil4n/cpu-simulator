@@ -10,7 +10,7 @@ const useSub = () => {
     const { info, error } = useLoggerContext();
     const { registers, regset } = useRegisterContext();
 
-    const sub = (dest: any, source: any) => {
+    const sub = (dest: string, source: string) => {
         if (!isRegister(dest)) {
             error("Destination must be a register.");
             return;

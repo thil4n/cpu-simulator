@@ -15,7 +15,7 @@ const usePop = () => {
     const { getMemoryBytes } = useMemoryContext();
     const { registers, regset } = useRegisterContext();
 
-    const pop = (operand: any) => {
+    const pop = (operand: string) => {
         if (!isRegister(operand)) {
             error("Invalid operand for pop. Must be a register.");
             return;

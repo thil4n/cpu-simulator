@@ -17,7 +17,7 @@ const ExecutionController = () => {
     const { registers, regset } = useRegisterContext();
     const logger = useLoggerContext();
 
-    const { push, pop, mov } = useInstructions();
+    const { push, pop, mov, add, sub, cmp } = useInstructions();
 
     const { modalStatus, openModal, closeModal } = useModal();
 
@@ -45,8 +45,33 @@ const ExecutionController = () => {
                 pop(operandOne);
                 break;
 
+            case "add":
+                add(operandOne, operandTwo);
+                break;
+
+            case "sub":
+                sub(operandOne, operandTwo);
+                break;
+
+            case "xor":
+                // Reuse sub logic pattern — XOR on registers
+                if (operandOne && operandTwo) {
+                    const destBits = registers[operandOne] ?? Array(64).fill(0);
+                    const srcBits = registers[operandTwo] ?? Array(64).fill(0);
+                    const resultBits = destBits.map((bit: number, i: number) => bit ^ srcBits[i]);
+                    regset(operandOne, resultBits);
+                    logger.info(`XOR ${operandOne}, ${operandTwo}`);
+                } else {
+                    logger.error("XOR requires two register operands.");
+                }
+                break;
+
+            case "cmp":
+                cmp(operandOne, operandTwo);
+                break;
+
             default:
-                logger.error("Invalid operation given.");
+                logger.error(`Unknown operation: ${operation}`);
                 break;
         }
     };

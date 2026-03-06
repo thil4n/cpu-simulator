@@ -1,20 +1,34 @@
 import { CpuIcon } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
-const Loader = ({ handleClose }) => {
+interface LoaderProps {
+    handleClose: () => void;
+}
+
+const Loader = ({ handleClose }: LoaderProps) => {
     const [percentage, setPercentage] = useState(0);
+
+    const stableHandleClose = useCallback(handleClose, []);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            if (percentage < 100) {
-                setPercentage((prevProgress) => prevProgress + 2);
-            } else {
-                handleClose();
-            }
+            setPercentage((prev) => {
+                if (prev >= 100) {
+                    clearInterval(interval);
+                    return prev;
+                }
+                return prev + 2;
+            });
         }, 50);
 
         return () => clearInterval(interval);
-    }, [percentage]);
+    }, []);
+
+    useEffect(() => {
+        if (percentage >= 100) {
+            stableHandleClose();
+        }
+    }, [percentage, stableHandleClose]);
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-50">

@@ -11,31 +11,45 @@ export const numberToLittleEndianBytes = (value: number | bigint): number[] => {
     return bytes;
 };
 
-// Converts [byte0, byte1, ..., byte7] → number
+// Converts [byte0, byte1, ..., byte7] → number (safe for values up to 2^53)
 export const littleEndianBytesToNumber = (bytes: number[]): number => {
-    let value = 0;
+    let value = 0n;
     for (let i = 0; i < bytes.length; i++) {
-        value |= (bytes[i] & 0xff) << (i * 8);
+        value |= BigInt(bytes[i] & 0xff) << BigInt(i * 8);
     }
-    return value;
+    return Number(value);
 };
 
-// Converts 64-bit bit array to number
+// Converts 64-bit MSB-first bit array to number
 export const bitArrayToNumber = (bitArray: number[]): number => {
-    return parseInt(bitArray.join(""), 2);
+    let value = 0n;
+    for (let i = 0; i < bitArray.length; i++) {
+        if (bitArray[i]) {
+            value |= 1n << BigInt(bitArray.length - 1 - i);
+        }
+    }
+    return Number(value);
 };
 
-// Converts number to 64-bit bit array
+// Converts number to 64-bit MSB-first bit array
 export const numberToBitArray = (value: number): number[] => {
-    const binary = value.toString(2).padStart(64, "0");
-    return Array.from(binary).map((bit) => parseInt(bit));
+    const big = BigInt(value);
+    const bits: number[] = [];
+    for (let i = 63; i >= 0; i--) {
+        bits.push(Number((big >> BigInt(i)) & 1n));
+    }
+    return bits;
 };
 
+// Converts 64-bit MSB-first bit array → 8 bytes (little-endian byte order)
+// Bit array: [MSB...LSB] → byte[0] = least significant byte
 export const bitsToBytes = (bitArray: number[]): number[] => {
     const bytes: number[] = [];
 
-    for (let i = 0; i < 64; i += 8) {
-        const byteBits = bitArray.slice(i, i + 8).reverse(); // MSB first per byte
+    // bitArray is MSB-first: bits[0..7] are the most significant byte
+    // We need little-endian bytes, so reverse the byte order
+    for (let i = 56; i >= 0; i -= 8) {
+        const byteBits = bitArray.slice(i, i + 8);
         const byte = parseInt(byteBits.join(""), 2);
         bytes.push(byte);
     }
@@ -43,13 +57,18 @@ export const bitsToBytes = (bitArray: number[]): number[] => {
     return bytes;
 };
 
+// Converts 8 bytes (little-endian) → 64-bit MSB-first bit array
 export const bytesToBits = (byteArray: number[]): number[] => {
-    const bitArray: number[] = [];
+    const bitArray: number[] = new Array(64).fill(0);
 
-    byteArray.forEach((byte) => {
-        const bits = byte.toString(2).padStart(8, "0").split("").map(Number);
-        bitArray.push(...bits.reverse()); // LSB first in each byte
-    });
+    // byte[0] is least significant → maps to bits[56..63]
+    for (let byteIdx = 0; byteIdx < byteArray.length; byteIdx++) {
+        const byte = byteArray[byteIdx] & 0xff;
+        const bitOffset = 64 - (byteIdx + 1) * 8; // byte 0 → offset 56, byte 7 → offset 0
+        for (let bit = 0; bit < 8; bit++) {
+            bitArray[bitOffset + bit] = (byte >> (7 - bit)) & 1;
+        }
+    }
 
     return bitArray;
 };

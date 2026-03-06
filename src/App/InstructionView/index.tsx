@@ -3,6 +3,7 @@ import { bitArrayToNumber, parseSingleLine } from "@utils";
 import { disassemble } from "@lib";
 import { Cpu } from "lucide-react";
 import { TXT_START } from "@config";
+import { useMemo } from "react";
 
 interface instructionLine {
     instruction: string;
@@ -15,24 +16,25 @@ const InstructionView = () => {
 
     const rip = bitArrayToNumber(registers.rip);
 
-    let tempPtr = TXT_START;
+    const instructions = useMemo(() => {
+        let tempPtr = TXT_START;
+        const result: instructionLine[] = [];
 
-    const instructions: instructionLine[] = [];
+        let fetch = true;
+        while (fetch) {
+            const opcodes = getMemoryBytes(tempPtr, 10);
 
-    let fetch = true;
-    while (fetch) {
-        const opcodes = getMemoryBytes(tempPtr, 10);
-
-        try {
-            const { instruction, length } = disassemble(opcodes);
-
-            instructions.push({ instruction, isCurrent: tempPtr == rip });
-
-            tempPtr += length;
-        } catch (error) {
-            fetch = false;
+            try {
+                const { instruction, length } = disassemble(opcodes);
+                result.push({ instruction, isCurrent: tempPtr === rip });
+                tempPtr += length;
+            } catch (error) {
+                fetch = false;
+            }
         }
-    }
+
+        return result;
+    }, [getMemoryBytes, rip]);
 
     return (
         <div>
@@ -40,11 +42,12 @@ const InstructionView = () => {
                 ASSEMBLY INSTRUCTIONS
             </h1>
             <div className="bg-[#555] bg-opacity-50 backdrop-blur-lg px-6 py-4 min-h-[400px]">
-                {instructions.map((line: instructionLine) => {
+                {instructions.map((line: instructionLine, index: number) => {
                     const { operation, operandOne, operandTwo } =
                         parseSingleLine(line.instruction);
                     return (
                         <div
+                            key={index}
                             className={`flex py-1 px-2 border-b border-secondary cursor-pointer
                 ${
                     line.isCurrent

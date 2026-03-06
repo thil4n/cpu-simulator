@@ -20,7 +20,7 @@ const useMov = () => {
 
     const { info, error } = useLoggerContext();
 
-    const mov = (src: any, dest: any) => {
+    const mov = (src: string, dest: string) => {
         // register to register
         if (isRegister(src) && isRegister(dest)) {
             const srcBits = registers[src] ?? Array(64).fill(0);

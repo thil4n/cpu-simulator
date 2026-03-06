@@ -9,7 +9,7 @@ interface Cell {
   value: number;
 }
 
-const MemoryView = ({ startAddress, wordCount = 24 }) => {
+const MemoryView = ({ startAddress, wordCount = 24, memory }: { startAddress: number; wordCount?: number; memory?: any }) => {
   const { getMemoryBytes } = useMemoryContext();
 
   const { formData, handleChange } = useForm({

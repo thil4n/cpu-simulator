@@ -10,12 +10,12 @@ interface InputProps {
   placeholder?: string;
   readOnly?: boolean;
   disabled?: boolean;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChange: (name: string, value: string) => void;
   inputClassName?: string;
   labelClassName?: string;
 }
 
-const Input: React.FC<InputProps> = ({
+const TextArea: React.FC<InputProps> = ({
   name,
   rows = 10,
   value,
@@ -76,4 +76,4 @@ const Input: React.FC<InputProps> = ({
   );
 };
 
-export default Input;
+export default TextArea;

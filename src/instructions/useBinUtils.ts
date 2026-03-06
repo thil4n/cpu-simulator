@@ -1,7 +1,7 @@
 import { useRegisterContext } from "@context";
 
 export const useBinaryUtils = () => {
-    const { registers, regset, regget } = useRegisterContext();
+    const { registers, regset } = useRegisterContext();
 
     // Register getter (ensures default zeros)
     const getRegisterBits = (reg: string): number[] => {
@@ -11,6 +11,5 @@ export const useBinaryUtils = () => {
     return {
         getRegisterBits,
         regset,
-        regget,
     };
 };

@@ -12,11 +12,11 @@ const useForm = (initialState: FormData) => {
     const [formData, setFormData] = useState<FormData>(initialState);
     const [errors, setErrors] = useState<Errors>({});
 
-    const handleChange = (name, value) => {
-        setFormData({
-            ...formData,
+    const handleChange = (name: string, value: any) => {
+        setFormData((prev) => ({
+            ...prev,
             [name]: value,
-        });
+        }));
     };
 
     return {

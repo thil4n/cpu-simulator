@@ -13,7 +13,7 @@ interface InputProps {
     icon?: React.ReactNode;
     readOnly?: boolean;
     disabled?: boolean;
-    handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleChange: (name: string, value: string) => void;
     inputClassName?: string;
     labelClassName?: string;
 }
@@ -35,7 +35,7 @@ const Input: React.FC<InputProps> = ({
     inputClassName = "",
     labelClassName = "",
 }) => {
-    const [showPassword, setShowPassword] = useState(false);
+    const [showPassword, setShowPassword] = useState(false); // eslint-disable-line @typescript-eslint/no-unused-vars
 
     const inputClasses = (): string => {
         let classes =

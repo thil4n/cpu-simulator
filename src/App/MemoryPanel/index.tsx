@@ -2,7 +2,11 @@ import { Button } from "@components";
 import { useLoggerContext, useRegisterContext } from "@context";
 import { bitArrayToNumber } from "@utils";
 
-const MemoryPanel = ({ showMemory }) => {
+interface MemoryPanelProps {
+    showMemory: (startAddr: number) => void;
+}
+
+const MemoryPanel = ({ showMemory }: MemoryPanelProps) => {
     const { registers } = useRegisterContext();
     const logger = useLoggerContext();
 
@@ -25,14 +29,14 @@ const MemoryPanel = ({ showMemory }) => {
                     />
                     <Button
                         text={"Heap"}
-                        handleClick={function (): void {
-                            throw new Error("Function not implemented.");
+                        handleClick={() => {
+                            logger.info("Heap view is not yet implemented.");
                         }}
                     />
                     <Button
                         text={".BSS"}
-                        handleClick={function (): void {
-                            throw new Error("Function not implemented.");
+                        handleClick={() => {
+                            logger.info(".BSS view is not yet implemented.");
                         }}
                     />
                     <Button
@@ -47,14 +51,14 @@ const MemoryPanel = ({ showMemory }) => {
                     />
                     <Button
                         text={".DATA"}
-                        handleClick={function (): void {
-                            throw new Error("Function not implemented.");
+                        handleClick={() => {
+                            logger.info(".DATA view is not yet implemented.");
                         }}
                     />
                     <Button
                         text={"Address"}
-                        handleClick={function (): void {
-                            throw new Error("Function not implemented.");
+                        handleClick={() => {
+                            logger.info("Address view is not yet implemented.");
                         }}
                     />
                 </div>

@@ -62,11 +62,13 @@ const Select: React.FC<SelectProps> = ({
   };
 
   useEffect(() => {
-    document.addEventListener("click", handleOutsideClick);
-    return () => {
-      document.removeEventListener("click", handleOutsideClick);
-    };
-  }, []);
+    if (isDropdownOpen) {
+      document.addEventListener("click", handleOutsideClick);
+      return () => {
+        document.removeEventListener("click", handleOutsideClick);
+      };
+    }
+  }, [isDropdownOpen]);
 
   return (
     <div className="w-full flex flex-col mb-1 relative">

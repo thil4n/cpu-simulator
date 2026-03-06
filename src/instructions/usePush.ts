@@ -17,7 +17,7 @@ const usePush = () => {
     const { setMemoryBytes } = useMemoryContext();
     const { registers, regset } = useRegisterContext();
 
-    const push = (operand: any) => {
+    const push = (operand: string) => {
         let byteArray: number[] | null = null;
 
         if (isRegister(operand)) {

@@ -51,14 +51,16 @@ function encodeXorRegToReg(dst: string | number, src: string | number) {
     return [rexPrefix, opcode, modrm];
 }
 
-function encodePushReg(reg) {
+function encodePushReg(reg: string | number) {
+    const rexPrefix = rex(1, 0, 0, 0);
     const opcode = 0x50 + registers[reg].code;
-    return [opcode];
+    return [rexPrefix, opcode];
 }
 
-function encodePopReg(reg) {
+function encodePopReg(reg: string | number) {
+    const rexPrefix = rex(1, 0, 0, 0);
     const opcode = 0x58 + registers[reg].code;
-    return [opcode];
+    return [rexPrefix, opcode];
 }
 
 export const assemble = ({ operation, operandOne, operandTwo }) => {

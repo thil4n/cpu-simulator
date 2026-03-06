@@ -5,7 +5,7 @@ const useCmp = () => {
     const { info, error } = useLoggerContext();
     const { registers, regset } = useRegisterContext();
 
-    const cmp = (op1: any, op2: any) => {
+    const cmp = (op1: string, op2: string) => {
         let val1: number;
         let val2: number;
 
@@ -33,12 +33,12 @@ const useCmp = () => {
         const SF = result < 0 ? 1 : 0;
         const CF = val1 < val2 ? 1 : 0;
 
-        regset("rflags", {
-            ...registers.rflags,
-            ZF,
-            SF,
-            CF,
-        });
+        // Update rflags as a 64-bit array with flag bits set at standard positions
+        const rflagsBits = Array(64).fill(0);
+        rflagsBits[63] = CF;  // Bit 0: Carry Flag
+        rflagsBits[57] = ZF;  // Bit 6: Zero Flag
+        rflagsBits[56] = SF;  // Bit 7: Sign Flag
+        regset("rflags", rflagsBits);
 
         info(
             `Compared ${op1} (${val1}) with ${
