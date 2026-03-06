@@ -2,6 +2,7 @@ import {
     useLoggerContext,
     useMemoryContext,
     useRegisterContext,
+    useExecutionContext,
 } from "@context";
 
 import { Button, Modal } from "@components";
@@ -12,6 +13,7 @@ const ProgramLoader = () => {
     const logger = useLoggerContext();
     const { clearMemory } = useMemoryContext();
     const { clearRegisters } = useRegisterContext();
+    const { clearHistory, clearBreakpoints } = useExecutionContext();
 
     const { modalStatus, openModal, closeModal } = useModal();
 
@@ -55,6 +57,10 @@ const ProgramLoader = () => {
 
                                 clearRegisters();
                                 logger.info("Clearing the registers.");
+
+                                clearHistory();
+                                clearBreakpoints();
+                                logger.info("Cleared execution history and breakpoints.");
 
                                 logger.info(
                                     "Pointing the RIP to the start of text section."

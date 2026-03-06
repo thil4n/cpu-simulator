@@ -1,4 +1,4 @@
-import { useMemoryContext, useRegisterContext } from "@context";
+import { useMemoryContext, useRegisterContext, useExecutionContext } from "@context";
 import { bitArrayToNumber, parseSingleLine } from "@utils";
 import { disassemble } from "@lib";
 import { Cpu } from "lucide-react";
@@ -7,12 +7,14 @@ import { useMemo } from "react";
 
 interface instructionLine {
     instruction: string;
+    address: number;
     isCurrent: boolean;
 }
 
 const InstructionView = () => {
     const { getMemoryBytes } = useMemoryContext();
     const { registers } = useRegisterContext();
+    const { breakpoints, toggleBreakpoint } = useExecutionContext();
 
     const rip = bitArrayToNumber(registers.rip);
 
@@ -26,7 +28,7 @@ const InstructionView = () => {
 
             try {
                 const { instruction, length } = disassemble(opcodes);
-                result.push({ instruction, isCurrent: tempPtr === rip });
+                result.push({ instruction, address: tempPtr, isCurrent: tempPtr === rip });
                 tempPtr += length;
             } catch (error) {
                 fetch = false;
@@ -45,10 +47,11 @@ const InstructionView = () => {
                 {instructions.map((line: instructionLine, index: number) => {
                     const { operation, operandOne, operandTwo } =
                         parseSingleLine(line.instruction);
+                    const hasBP = breakpoints.has(line.address);
                     return (
                         <div
                             key={index}
-                            className={`flex py-1 px-2 border-b border-secondary cursor-pointer
+                            className={`flex items-center py-1 px-2 border-b border-secondary cursor-pointer group
                 ${
                     line.isCurrent
                         ? "bg-secondary text-white"
@@ -56,7 +59,21 @@ const InstructionView = () => {
                 }
             `}
                         >
-                            {" "}
+                            {/* Breakpoint gutter */}
+                            <div
+                                className="w-5 h-5 flex items-center justify-center mr-2 shrink-0"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleBreakpoint(line.address);
+                                }}
+                                title={hasBP ? "Remove breakpoint" : "Set breakpoint"}
+                            >
+                                {hasBP ? (
+                                    <span className="w-3 h-3 rounded-full bg-red-500 inline-block shadow-[0_0_6px_rgba(239,68,68,0.7)]" />
+                                ) : (
+                                    <span className="w-3 h-3 rounded-full border border-slate-600 inline-block opacity-0 group-hover:opacity-50 transition-opacity" />
+                                )}
+                            </div>
                             <div className="w-32">{operation}</div>
                             <div className="w-[300px]">{operandOne}</div>
                             <div className="">{operandTwo}</div>
