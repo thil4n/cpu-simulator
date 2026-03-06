@@ -42,4 +42,52 @@ sub rax, 10`,
 
     "Zero Register": `mov rax, 123
 xor rax, rax`,
+
+    "Bit Manipulation": `mov rax, 255
+and rax, 15
+or rax, 240
+not rax`,
+
+    "Shift Operations": `mov rax, 1
+shl rax, 4
+shr rax, 2`,
+
+    "Inc / Dec": `mov rcx, 10
+dec rcx
+dec rcx
+inc rcx`,
+
+    "Multiply & Divide": `mov rax, 12
+mov rbx, 5
+mul rbx
+mov rax, 100
+mov rbx, 7
+div rbx`,
+
+    "Compare & Jump": `mov rax, 5
+mov rbx, 5
+cmp rax, rbx
+je 3
+nop
+nop`,
+
+    "Exchange Regs": `mov rax, 111
+mov rbx, 222
+xchg rax, rbx`,
+
+    "Load Address": `lea rax, 4096
+lea rbx, 8192`,
+
+    "Test & Branch": `mov rax, 0
+test rax, rax
+jne 3
+mov rbx, 42`,
+
+    "Negate Value": `mov rax, 50
+neg rax
+mov rbx, rax`,
+
+    "IMUL Two-Operand": `mov rax, 6
+mov rbx, 7
+imul rax, rbx`,
 };
